@@ -6,7 +6,7 @@ pragma solidity ^0.8.34;
 
 /// @title The Voting contract .
 /// @author Mikiyas Yimer.
-/// @notice It is here only for to be refactored and tested. Don't push this code to production.
+/// @notice It is here only to be refactored and tested. Don't push this code to production.
 /// @dev Don't push this code to production.
 /// @custom:experimental This is an experimental contract.
 contract Voting {
@@ -40,7 +40,7 @@ contract Voting {
     event VotedYes(address indexed user);
     event VotedNo(address indexed user);
     event VoteActivated();
-    event VoteCancled();
+    event VoteCancelled();
 
     error AlreadyVoted();
     error NotActive();
@@ -56,8 +56,8 @@ contract Voting {
 
     /// @notice this is the constructor and in it we set up the proposal name, proposal description and the owner.
     constructor() {
-        proposal.name = "Should we add pool in the house?";
-        proposal.description = "should we add a swiming pool to the new house that we are building.";
+        proposal.name = "Should we add swimming pool in the house?";
+        proposal.description = "should we add a swimming pool to the new house that we are building.";
         _owner = msg.sender;
     }
 
@@ -76,11 +76,11 @@ contract Voting {
         if (status != Status.Active) revert NotInActiveStage();
 
         status = Status.Closed;
-        emit VoteCancled();
+        emit VoteCancelled();
     }
 
     /// @notice This is Yes voting function.
-    /// @dev It increments the yesVote variable and update the hasVoted mapping then emits an event.
+    /// @dev It increments the _yesVote variable and update the hasVoted mapping then emits an event.
     function voteYes() external {
         if (status != Status.Active) revert NotActive();
         if (_hasVoted[msg.sender] == true) revert AlreadyVoted();
@@ -91,7 +91,7 @@ contract Voting {
     }
 
     /// @notice This is No voting function.
-    /// @dev It increments the noVote variable and update the hasVoted mapping then emits an event.
+    /// @dev It increments the _noVote variable and update the hasVoted mapping then emits an event.
     function voteNo() external {
         if (status != Status.Active) revert NotActive();
         if (_hasVoted[msg.sender] == true) revert AlreadyVoted();
@@ -102,13 +102,13 @@ contract Voting {
     }
 
     /// @notice This function is used to see the yes vote count.
-    /// @return yes votes.
+    /// @return The total count of yes votes.
     function seeYesVotes() external view returns (uint256) {
         return _yesVotes;
     }
 
     /// @notice This function is used to see the no vote count.
-    /// @return The total count of yes votes.
+    /// @return The total count of no votes.
     function seeNoVotes() external view returns (uint256) {
         return _noVotes;
     }
