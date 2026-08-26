@@ -10,6 +10,7 @@ pragma solidity ^0.8.34;
 /// @dev Don't push this code to production.
 /// @custom:experimental This is an experimental contract.
 contract Voting {
+    /// @notice This struct is used for the declaration of the name and description for the proposal.
     struct Proposal {
         string name;
         string description;
@@ -22,13 +23,19 @@ contract Voting {
         Closed
     }
 
+    /// @notice proposal is the declaration of Proposal struct.
     Proposal proposal;
+    /// @notice status is the declaration of Status enum.
     Status status;
 
-    address private owner;
-    uint256 yesVote;
-    uint256 noVote;
-    mapping(address => bool) internal hasVoted;
+    /// @notice _owner is the address of the owner.
+    address private _owner;
+    /// @notice _yesVotes are the number of yes votes.
+    uint256 _yesVotes;
+    /// @notice _noVotes are the number of no votes.
+    uint256 _noVotes;
+    /// @notice _hasVoted is mapping which is used for checking if the voter has voted.
+    mapping(address => bool) internal _hasVoted;
 
     event VotedYes(address indexed user);
     event VotedNo(address indexed user);
@@ -42,21 +49,21 @@ contract Voting {
     error NotOwner();
     error NotClosedYet();
 
+    modifier onlyOwner() {
+        if (_owner != msg.sender) revert NotOwner();
+        _;
+    }
+
     /// @notice this is the constructor and in it we set up the proposal name, proposal description and the owner.
     constructor() {
         proposal.name = "Should we add pool in the house?";
         proposal.description = "should we add a swiming pool to the new house that we are building.";
-        owner = msg.sender;
-    }
-
-    modifier onlyOwner() {
-        if (owner != msg.sender) revert NotOwner();
-        _;
+        _owner = msg.sender;
     }
 
     /// @notice This function activates the voting and only can be called by the owner.
     /// @dev It activates the vote by updating the enum and then emits an event.
-    function activeateTheVote() external onlyOwner {
+    function activateVoting() external onlyOwner {
         if (status != Status.Pending) revert NotInPendingStage();
 
         status = Status.Active;
@@ -73,47 +80,47 @@ contract Voting {
     }
 
     /// @notice This is Yes voting function.
-    /// @dev it increment the yesVote variable and update the hasVoted mapping then emits an event.
+    /// @dev It increments the yesVote variable and update the hasVoted mapping then emits an event.
     function voteYes() external {
         if (status != Status.Active) revert NotActive();
-        if (hasVoted[msg.sender] == true) revert AlreadyVoted();
+        if (_hasVoted[msg.sender] == true) revert AlreadyVoted();
 
-        yesVote++;
-        hasVoted[msg.sender] = true;
+        _yesVotes++;
+        _hasVoted[msg.sender] = true;
         emit VotedYes(msg.sender);
     }
 
     /// @notice This is No voting function.
-    /// @dev it decrement the noVote variable and update the hasVoted mapping then emits an event.
+    /// @dev It increments the noVote variable and update the hasVoted mapping then emits an event.
     function voteNo() external {
         if (status != Status.Active) revert NotActive();
-        if (hasVoted[msg.sender] == true) revert AlreadyVoted();
+        if (_hasVoted[msg.sender] == true) revert AlreadyVoted();
 
-        noVote++;
-        hasVoted[msg.sender] = true;
+        _noVotes++;
+        _hasVoted[msg.sender] = true;
         emit VotedNo(msg.sender);
     }
 
     /// @notice This function is used to see the yes vote count.
     /// @return yes votes.
     function seeYesVotes() external view returns (uint256) {
-        return yesVote;
+        return _yesVotes;
     }
 
     /// @notice This function is used to see the no vote count.
-    /// @return no votes.
+    /// @return The total count of yes votes.
     function seeNoVotes() external view returns (uint256) {
-        return noVote;
+        return _noVotes;
     }
 
     /// @notice This function tells us who the winner is or if it is a tie.
-    /// @return yes won, its a tie, no won.
+    /// @return A string indicating the result: "yes won", "its a tie", or "no won".
     function seeWinner() external view returns (string memory) {
         if (status != Status.Closed) revert NotClosedYet();
 
-        if (yesVote > noVote) {
+        if (_yesVotes > _noVotes) {
             return "yes won";
-        } else if (yesVote == noVote) {
+        } else if (_yesVotes == _noVotes) {
             return "its a tie";
         } else {
             return "no won";

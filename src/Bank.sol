@@ -24,13 +24,13 @@ contract Bank {
     error NotEnoughMoney();
     error TransferFailed();
 
-    constructor() {
-        owner = msg.sender;
-    }
-
     modifier onlyOwner() {
         if (msg.sender != owner) revert NotOwner();
         _;
+    }
+
+    constructor() {
+        owner = msg.sender;
     }
 
     receive() external payable {
