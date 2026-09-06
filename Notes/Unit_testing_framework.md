@@ -66,6 +66,7 @@ INVARIANTS (English):
   I4: nobody can withdraw more than their share
 
 
+MAKE SURE YOU TAKE A MINUTE OR TWO TO FOCUS AND TRY TO FIND EDGE CASE WHILE TESTING LIKE TRY TO FIND THE EDGE CASE OKAY.
 
 
 Definition of done for the unit phase
