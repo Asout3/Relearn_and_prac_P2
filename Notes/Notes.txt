@@ -81,3 +81,12 @@
       dummyNonOwner: non owner and voter.
 
 
+
+
+
+
+okay first let me answer your questions:
+1. vm.prank is like create an address and like it only applys for one call which is only the next line coming after it right it must be like that for one only but vm.startPrank is like it startPrank and it could go and like not only for the next line it could go on till we added stopPrank.
+2. so the msg.sender for deposit is like alice but not for withdraw it is the contract because vm.prank only works for one line next to it.
+3. so you shouldn't forget it because you cant call with other caller, permission may pass incorrectly later assertion become confusing like you are testing bob but you think you are testing alice.
+4. alice contract must have enough eth to make transfer the amount to the intended address which i belive is the bank.
