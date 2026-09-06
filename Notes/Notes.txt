@@ -1,0 +1,83 @@
+1. STATES the contract can be in:-
+      
+      1.1 Explicit:-
+      - Pending
+      - Active 
+      - Closed
+      
+      1.2 IMPLICIT STATES:-
+      - hasVoted
+      - NotVoted
+      - yes won
+      - no won
+      - its a tie
+
+2. FUNCTIONS + what state each touches:-
+      
+      2.1 activateVoting():-
+            b1: owner != msg.sender  =>  revert NotOwner.
+            b2: status == status.Pending  =>  pass.
+            b3: status == status.Active  => revert  NotInPendingStage.
+            b4: status == status.Closed  => revert  NotInPendingStage.
+            
+            updates status to status.Active.
+            emits an event  => VoteActivated.
+
+      2.2 closeTheVote():-
+            b1: owner != msg.sender  =>  revert NotOwner.
+            b2: status == Status.Active  =>  pass 
+            b3: status == status.Pending  => revert NotInActiveStage.
+            b4: status == status.Closed  => revert NotInActiveStage.
+
+            updates status to status.Closed
+            emits an event  => VoteCancelled.
+
+      2.3 voteYes():-
+            b1: status == status.Active  => pass
+            b2: status == status.Pending  => revert NotActive.
+            b3: status == status.Closed  => revert NotActive.
+            b4: _hasVoted[msg.sender] == true  => revert AlreadyVoted.
+            b5: _hasVoted[msg.sender] == false  => pass.
+
+            increment yesVotes.
+            update _hasVoted.
+            emits an event => VotedYes.
+
+      2.3 voteNo():-
+            b1: status == status.Active  => pass
+            b2: status == status.Pending  => revert NotActive.
+            b3: status == status.Closed  => revert NotActive.
+            b4: _hasVoted[msg.sender] == true  => revert AlreadyVoted.
+            b5: _hasVoted[msg.sender] == false  => pass.
+
+            increment noVotes.
+            update _hasVoted.
+            emits an event => VotedNo.
+
+      2.4 seeYesVotes():-
+            returns  =>  yesVotes.
+
+      2.5 seeNoVotes():-
+            returns  =>  noVotes.
+
+      2.6 seeWinner():-
+            b1: status == status.Active  => revert NotClosedYet.
+            b2: status == status.Pending  => revert NotClosedYet.
+            b3: status == status.Closed  => pass.
+            b4: _yesVotes > _noVotes  =>  return "yes Won".
+            b5: _yesVotes == _noVotes  => returns "its a tie".
+            b6: _yesVotes < _noVotes  =>  returns "no won"
+
+            returns strings.
+
+3. INVARIANTS (English):-
+     
+      I1: Only owner can update the explicit states
+      I2: No one can't proceed(vote) unless the explicit states allows you.
+
+4. Actors:-
+
+      owner: have some privileges.
+      dummyNonOwner: non owner and voter.
+
+

@@ -126,4 +126,8 @@ contract Voting {
             return "no won";
         }
     }
+
+    function getStatus() public view returns (Status) {
+        return status;
+    }
 }
