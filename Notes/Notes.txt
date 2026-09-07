@@ -1,84 +1,131 @@
+1. accorinding to like the main erc-20 spec it should pass like it doesn't treat zero address as such a thing they can send it to zero address so that means they are burning it, who would burn a token that must be expenisve for the one who is sending to zero address so ya that is it.
+2. well as i read from the spec it doesn't stop you from putting the same address from puting the same address on the that same spot right but i personally believe protocols should do some reserach and i know the probablity of someone putting the same address on  those two thing are low so which one is more efficent should we check every time and that is also require gas or should we let them do that and see if it is like expenisve as well but i think we should let them do that.
+3. ownerOf is like owner of that nft and get approved is like same as transferFrom in erc20 whihc gives it approval for that token id so it can do that.
+
+
+
+
 1. STATES the contract can be in:-
-      
-      1.1 Explicit:-
-      - Pending
-      - Active 
-      - Closed
-      
-      1.2 IMPLICIT STATES:-
-      - hasVoted
-      - NotVoted
-      - yes won
-      - no won
-      - its a tie
+      1.1 Explicit test: 
+            - Nothing explicitly stated.
+
+      1.2 Implicit test:
+            - Insufficient Balance
+            - sufficient Balance
+            - Insufficient Allowance
+            - sufficient Allowance
+            - Approved
+            - Not Approved
 
 2. FUNCTIONS + what state each touches:-
-      
-      2.1 activateVoting():-
-            b1: owner != msg.sender  =>  revert NotOwner.
-            b2: status == status.Pending  =>  pass.
-            b3: status == status.Active  => revert  NotInPendingStage.
-            b4: status == status.Closed  => revert  NotInPendingStage.
+
+      2.1 transfer():-
+            Inputs: _to, _amount
+
+     DONE   b1: balanceOf(msg.sender) < _amount  -> reverts Insufficient Balance.
+     DONE   b2: balanceOf(msg.sender) > _amount  -> pass.
+     DONE   b3: balanceOf(msg.sender) == _amount  -> pass.
+     DONE   b4: pass -> balance actually moved. 
+     DONE   b5: input - _amount - zero -> pass.
+     DONE   b6: input - _to - zero address -> pass.
+     DONE   b7: input - _to &  _amount - zero -> pass.
             
-            updates status to status.Active.
-            emits an event  => VoteActivated.
 
-      2.2 closeTheVote():-
-            b1: owner != msg.sender  =>  revert NotOwner.
-            b2: status == Status.Active  =>  pass 
-            b3: status == status.Pending  => revert NotInActiveStage.
-            b4: status == status.Closed  => revert NotInActiveStage.
+     DONE   emits event -> Transfer(address indexed sender, address indexed receiver, uint256 amount)
+            return true.
 
-            updates status to status.Closed
-            emits an event  => VoteCancelled.
+      2.2 approve():-
+            Inputs: _spender, _amount
 
-      2.3 voteYes():-
-            b1: status == status.Active  => pass
-            b2: status == status.Pending  => revert NotActive.
-            b3: status == status.Closed  => revert NotActive.
-            b4: _hasVoted[msg.sender] == true  => revert AlreadyVoted.
-            b5: _hasVoted[msg.sender] == false  => pass.
+      DONE  b1: pass -> check if approved.
+      DONE  b2: input - _spender - zero -> pass.
+      DONE  b3: input - _amount - zero -> pass.  -- THIS ONE FAILS EVENTUALLY FAILS SO I CAN'T APPROVE ZERO
+      DONE  b4: input - _amount - more than the approver have -> pass.
+      DONE  b5: input - _spender - approver address -> pass.
 
-            increment yesVotes.
-            update _hasVoted.
-            emits an event => VotedYes.
 
-      2.3 voteNo():-
-            b1: status == status.Active  => pass
-            b2: status == status.Pending  => revert NotActive.
-            b3: status == status.Closed  => revert NotActive.
-            b4: _hasVoted[msg.sender] == true  => revert AlreadyVoted.
-            b5: _hasVoted[msg.sender] == false  => pass.
+      DONE   emits event -> Approval(address indexed owner, address indexed spender, uint256 value)
+            returns true.
 
-            increment noVotes.
-            update _hasVoted.
-            emits an event => VotedNo.
+      2.3 transferFrom():-
+            Inputs: _from, _to, _amount
 
-      2.4 seeYesVotes():-
-            returns  =>  yesVotes.
+      DONE  b1: pass -> make sure it works
+      DONE  b2: allowance[_from][msg.sender] < _amount  -> revert Insufficient Allowance.
+      DONE  b3: allowance[_from][msg.sender] > _amount  -> pass.
+      DONE  b4: allowance[_from][msg.sender] == _amount  -> pass.
+      DONE  b5: balanceOf(_from) < _amount  -> revert Insufficient Balance.
+      DONE  b6: balanceOf(_from) > _amount  -> pass.
+      DONE  b7: balanceOf(_from) == _amount  -> pass.
+      DONE  b8: Input - _from & _to - similar address -> pass.
+      DONE  b9: Input - _amount - 0 -> pass.
+      DONE  b10: Input - _amount - max + 1 wei -> fails.
+      DONE  b11: Input - _from & _to - zero address -> pass.
+      DONE  b12 Input - _from & _to - sender(caller) address -> pass.
 
-      2.5 seeNoVotes():-
-            returns  =>  noVotes.
+            emits event -> Transfer(address indexed sender, address indexed receiver, uint256 amount)
+            return true.
 
-      2.6 seeWinner():-
-            b1: status == status.Active  => revert NotClosedYet.
-            b2: status == status.Pending  => revert NotClosedYet.
-            b3: status == status.Closed  => pass.
-            b4: _yesVotes > _noVotes  =>  return "yes Won".
-            b5: _yesVotes == _noVotes  => returns "its a tie".
-            b6: _yesVotes < _noVotes  =>  returns "no won"
+      2.4 checkApproval():-
+            Inputs: _owner, _to
 
-            returns strings.
+      DONE  b1: pass -> make sure it works.
+      DONE  b2: allowance[_owner][_to] == 0 -> false;
+      DONE  b3: allowance[_owner][_to] != 0 -> true;
+      DONE  b4: Input - _owner & _to - similar address -> false;
+      DONE  b5: Input - _owner & _to - similar caller address -> false;
 
-3. INVARIANTS (English):-
-     
-      I1: Only owner can update the explicit states
-      I2: No one can't proceed(vote) unless the explicit states allows you.
+            return true;
 
-4. Actors:-
+      2.6 totalSupplies():-
+      DONE  returns total supply.
 
-      owner: have some privileges.
-      dummyNonOwner: non owner and voter.
+      2.7 balanceOf():-
+            Inputs: _address
+
+      DONE  b1: pass -> make sure it works.
+      DONE  b2: Inputs - _address - zero address -> return 0.
+      DONE  b3: Inputs - _address - random non existent address -> return 0.
+ 
+
+
+Actors    token
+
+alice      10
+bob        10
+john       0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
