@@ -92,7 +92,7 @@ contract TestERC20 is Test {
         vm.expectRevert(Asout3Token.InsufficientBalance.selector);
         vm.prank(john);
         bool ok = token.transfer(address(alice), 2 * 1e18);
-        assertTrue(ok, "failed");
+        assertFalse(ok, "failed");
     }
 
     function test_approve_works() public {
@@ -195,7 +195,7 @@ contract TestERC20 is Test {
 
         vm.expectRevert(Asout3Token.InsufficientAllowance.selector);
         bool ok = token.transferFrom(address(alice), address(john), 5 * 1e18);
-        assertTrue(ok, "failed");
+        assertFalse(ok, "failed");
         vm.stopPrank();
     }
 
@@ -234,7 +234,7 @@ contract TestERC20 is Test {
 
         vm.expectRevert(Asout3Token.InsufficientBalance.selector);
         bool ok = token.transferFrom(address(alice), address(john), 15 * 1e18);
-        assertTrue(ok, "failed");
+        assertFalse(ok, "failed");
         vm.stopPrank();
     }
 
@@ -294,7 +294,7 @@ contract TestERC20 is Test {
 
         vm.expectRevert(Asout3Token.InsufficientAllowance.selector);
         bool ok = token.transferFrom(address(alice), address(john), 8 * 1e18 + 1 wei);
-        assertTrue(ok, "failed");
+        assertFalse(ok, "failed");
         vm.stopPrank();
     }
 
