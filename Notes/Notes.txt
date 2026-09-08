@@ -97,15 +97,18 @@ john       0
 
 
 
+1. State Transition Chains (Your Biggest Gap).
+ - You tested every function individually. You never tested what happens when functions compose across multiple calls. This is where real bugs live.
+Mental model: After every state-changing call, ask "what can I do NEXT that depends on this new state?"
 
+2. Cross-Function Invariants
+- Single-function tests verify local correctness. They don't verify global properties that must hold across ALL functions.
+Mental model: Write down statements that should ALWAYS be true regardless of call sequence. Then test them
+thend write test about i
 
-
-
-
-
-
-
-
+3. Adversarial Input Combinations
+- You tested zero addresses and zero amounts separately. You didn't test hostile combinations.
+Mental model: For each function with N parameters, ask "what if an attacker controls ALL inputs simultaneously?"
 
 
 
