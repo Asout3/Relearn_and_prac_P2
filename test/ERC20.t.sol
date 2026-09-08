@@ -22,8 +22,12 @@ contract TestERC20 is Test {
         bob = makeAddr("bob");
         john = makeAddr("john");
 
-        token.transfer(address(alice), 10 * 1e18);
-        token.transfer(address(bob), 10 * 1e18);
+        // i did this check to avoid the warning when i compile
+        // i could just transfer the token but i hate the warnings
+        bool success = token.transfer(address(alice), 10 * 1e18);
+        assertTrue(success, "failed");
+        bool ok = token.transfer(address(bob), 10 * 1e18);
+        assertTrue(ok, "failed");
     }
 
     function test_transfer() public {
@@ -31,7 +35,8 @@ contract TestERC20 is Test {
         emit Transfer(address(alice), address(bob), 2 * 1e18);
 
         vm.prank(alice);
-        token.transfer(address(bob), 2 * 1e18);
+        bool ok = token.transfer(address(bob), 2 * 1e18);
+        assertTrue(ok, "failed");
 
         assertEq(token.balanceOf(address(alice)), 8 * 1e18);
         assertEq(token.balanceOf(address(bob)), 12 * 1e18);
@@ -42,7 +47,8 @@ contract TestERC20 is Test {
         emit Transfer(address(alice), address(bob), 10 * 1e18);
 
         vm.prank(alice);
-        token.transfer(address(bob), 10 * 1e18);
+        bool ok = token.transfer(address(bob), 10 * 1e18);
+        assertTrue(ok, "failed");
 
         assertEq(token.balanceOf(address(alice)), 0);
         assertEq(token.balanceOf(address(bob)), 20 * 1e18);
@@ -53,7 +59,8 @@ contract TestERC20 is Test {
         emit Transfer(address(alice), address(bob), 0);
 
         vm.prank(alice);
-        token.transfer(address(bob), 0);
+        bool ok = token.transfer(address(bob), 0);
+        assertTrue(ok, "failed");
 
         assertEq(token.balanceOf(address(alice)), 10 * 1e18);
         assertEq(token.balanceOf(address(bob)), 10 * 1e18);
@@ -64,7 +71,8 @@ contract TestERC20 is Test {
         emit Transfer(address(alice), address(0), 1 * 1e18);
 
         vm.prank(alice);
-        token.transfer(address(0), 1 * 1e18);
+        bool ok = token.transfer(address(0), 1 * 1e18);
+        assertTrue(ok, "failed");
 
         assertEq(token.balanceOf(address(alice)), 9 * 1e18);
     }
@@ -74,7 +82,8 @@ contract TestERC20 is Test {
         emit Transfer(address(alice), address(0), 0);
 
         vm.prank(alice);
-        token.transfer(address(0), 0);
+        bool ok = token.transfer(address(0), 0);
+        assertTrue(ok, "failed");
 
         assertEq(token.balanceOf(address(alice)), 10 * 1e18);
     }
@@ -82,7 +91,8 @@ contract TestERC20 is Test {
     function test_transfer_reverts_with_Insufficient_Balance() public {
         vm.expectRevert(Asout3Token.InsufficientBalance.selector);
         vm.prank(john);
-        token.transfer(address(alice), 2 * 1e18);
+        bool ok = token.transfer(address(alice), 2 * 1e18);
+        assertTrue(ok, "failed");
     }
 
     function test_approve_works() public {
@@ -164,7 +174,8 @@ contract TestERC20 is Test {
         vm.expectEmit();
         emit Transfer(address(alice), address(john), 2 * 1e18);
 
-        token.transferFrom(address(alice), address(john), 2 * 1e18);
+        bool ok = token.transferFrom(address(alice), address(john), 2 * 1e18);
+        assertTrue(ok, "failed");
         vm.stopPrank();
 
         assertEq(token.balanceOf(address(john)), 2 * 1e18);
@@ -183,7 +194,8 @@ contract TestERC20 is Test {
         assertTrue(success, "it fails");
 
         vm.expectRevert(Asout3Token.InsufficientAllowance.selector);
-        token.transferFrom(address(alice), address(john), 5 * 1e18);
+        bool ok = token.transferFrom(address(alice), address(john), 5 * 1e18);
+        assertTrue(ok, "failed");
         vm.stopPrank();
     }
 
@@ -201,7 +213,8 @@ contract TestERC20 is Test {
         vm.expectEmit();
         emit Transfer(address(alice), address(john), 10 * 1e18);
 
-        token.transferFrom(address(alice), address(john), 10 * 1e18);
+        bool ok = token.transferFrom(address(alice), address(john), 10 * 1e18);
+        assertTrue(ok, "failed");
         vm.stopPrank();
 
         assertEq(token.balanceOf(address(john)), 10 * 1e18);
@@ -220,7 +233,8 @@ contract TestERC20 is Test {
         assertTrue(success, "it fails");
 
         vm.expectRevert(Asout3Token.InsufficientBalance.selector);
-        token.transferFrom(address(alice), address(john), 15 * 1e18);
+        bool ok = token.transferFrom(address(alice), address(john), 15 * 1e18);
+        assertTrue(ok, "failed");
         vm.stopPrank();
     }
 
@@ -238,7 +252,8 @@ contract TestERC20 is Test {
         vm.expectEmit();
         emit Transfer(address(alice), address(alice), 10 * 1e18);
 
-        token.transferFrom(address(alice), address(alice), 10 * 1e18);
+        bool ok = token.transferFrom(address(alice), address(alice), 10 * 1e18);
+        assertTrue(ok, "failed");
         vm.stopPrank();
 
         assertEq(token.balanceOf(address(alice)), 10 * 1e18);
@@ -258,7 +273,8 @@ contract TestERC20 is Test {
         vm.expectEmit();
         emit Transfer(address(alice), address(john), 0 * 1e18);
 
-        token.transferFrom(address(alice), address(john), 0 * 1e18);
+        bool ok = token.transferFrom(address(alice), address(john), 0 * 1e18);
+        assertTrue(ok, "failed");
         vm.stopPrank();
 
         assertEq(token.balanceOf(address(john)), 0 * 1e18);
@@ -277,7 +293,8 @@ contract TestERC20 is Test {
         assertTrue(success, "it fails");
 
         vm.expectRevert(Asout3Token.InsufficientAllowance.selector);
-        token.transferFrom(address(alice), address(john), 8 * 1e18 + 1 wei);
+        bool ok = token.transferFrom(address(alice), address(john), 8 * 1e18 + 1 wei);
+        assertTrue(ok, "failed");
         vm.stopPrank();
     }
 
@@ -295,7 +312,8 @@ contract TestERC20 is Test {
         vm.expectEmit();
         emit Transfer(address(0), address(0), 0 * 1e18);
 
-        token.transferFrom(address(0), address(0), 0 * 1e18);
+        bool ok = token.transferFrom(address(0), address(0), 0 * 1e18);
+        assertTrue(ok, "failed");
         vm.stopPrank();
     }
 
@@ -313,7 +331,8 @@ contract TestERC20 is Test {
         vm.expectEmit();
         emit Transfer(address(alice), address(alice), 0 * 1e18);
 
-        token.transferFrom(address(alice), address(alice), 0 * 1e18);
+        bool ok = token.transferFrom(address(alice), address(alice), 0 * 1e18);
+        assertTrue(ok, "failed");
         vm.stopPrank();
 
         assertEq(token.balanceOf(address(alice)), 10 * 1e18);
