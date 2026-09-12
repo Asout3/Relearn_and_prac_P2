@@ -118,9 +118,6 @@ contract TestERC20 is Test {
         assertTrue(success, "it fails");
     }
 
-    // This shit fails wow I WILL NOT FIX IT I WILL KEEP IT.
-    // inorder it to pass i need to make it to assertFalse(success, "it fails")
-    // but i want to keep it
     function test_approve_amount_is_zero() public {
         vm.expectEmit();
         emit Approval(address(alice), address(john), 0);

@@ -5,7 +5,7 @@ import {Test} from "forge-std/Test.sol";
 import {console} from "forge-std/console.sol";
 import {MyNft} from "../src/ERC721.sol";
 
-contract testERC721 is Test {
+contract ERC721Test is Test {
     MyNft mynft;
     address bel;
     address alice;
