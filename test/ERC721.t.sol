@@ -33,8 +33,8 @@ contract testERC721 is Test {
     }
 
     function test_mint_works() public {
-        vm.expectEmit(true, false, false, true);
-        emit OwnershipTrasfered(address(0), address(alice), 17);
+        vm.expectEmit(true, true, true, false);
+        emit OwnershipTrasfered(address(0), address(alice), 16);
 
         mynft.mint(address(alice));
 
@@ -55,7 +55,7 @@ contract testERC721 is Test {
 
     function test_transferOwnership_works() public {
         vm.startPrank(alice);
-        vm.expectEmit(true, false, false, true);
+        vm.expectEmit(true, true, true, false);
         emit OwnershipTrasfered(address(alice), address(john), 5);
 
         mynft.transferOwnership(address(alice), address(john), 5);
@@ -79,7 +79,7 @@ contract testERC721 is Test {
 
     function test_transferOwnership_pass_on_the_same_address() public {
         vm.startPrank(alice);
-        vm.expectEmit(true, false, false, true);
+        vm.expectEmit(true, true, true, false);
         emit OwnershipTrasfered(address(alice), address(alice), 5);
 
         mynft.transferOwnership(address(alice), address(alice), 5);
@@ -95,7 +95,7 @@ contract testERC721 is Test {
 
     function test_transferOwnership_works_on_transfering_to_zero_address() public {
         vm.startPrank(alice);
-        vm.expectEmit(true, false, false, true);
+        vm.expectEmit(true, true, true, false);
         emit OwnershipTrasfered(address(alice), address(0), 5);
 
         mynft.transferOwnership(address(alice), address(0), 5);
@@ -106,7 +106,7 @@ contract testERC721 is Test {
 
     function test_MyNft_approve_works() public {
         vm.startPrank(alice);
-        vm.expectEmit(true, false, false, true);
+        vm.expectEmit(true, false, true, false);
         emit Approved(address(alice), address(john), 2);
 
         mynft.approve(address(john), 2);
@@ -123,7 +123,7 @@ contract testERC721 is Test {
 
     function test_My_Nft_approve_pass_on_approving_to_zero_address() public {
         vm.startPrank(alice);
-        vm.expectEmit(true, false, false, true);
+        vm.expectEmit(true, false, true, false);
         emit Approved(address(alice), address(0), 2);
 
         mynft.approve(address(0), 2);
@@ -132,7 +132,7 @@ contract testERC721 is Test {
 
     function test_MyNft_approve_pass_on_approving_your_self() public {
         vm.startPrank(alice);
-        vm.expectEmit(true, false, false, true);
+        vm.expectEmit(true, false, true, false);
         emit Approved(address(alice), address(alice), 2);
 
         mynft.approve(address(alice), 2);
@@ -149,7 +149,7 @@ contract testERC721 is Test {
         uint256 tokenIdToTransfer = 2;
         uint256 amountOfNftAliceHaveBeforeTransfer = mynft.amountOfNft(alice);
 
-        vm.expectEmit(true, true, false, true);
+        vm.expectEmit(true, true, true, false);
         emit Transfered(alice, john, tokenIdToTransfer);
 
         vm.prank(alice);
@@ -184,7 +184,7 @@ contract testERC721 is Test {
         uint256 tokenIdToTransfer = 2;
         uint256 aliceAmountBefore = mynft.amountOfNft(alice);
 
-        vm.expectEmit(true, false, false, true);
+        vm.expectEmit(true, true, true, false);
         emit Transfered(alice, alice, tokenIdToTransfer);
 
         vm.prank(alice);
@@ -196,7 +196,7 @@ contract testERC721 is Test {
     function test_MyNft_transfer_emits_when_transfered() public {
         uint256 tokenIdToTransfer = 2;
 
-        vm.expectEmit(true, false, false, true);
+        vm.expectEmit(true, true, true, false);
         emit Transfered(alice, john, tokenIdToTransfer);
 
         vm.prank(alice);
@@ -211,7 +211,7 @@ contract testERC721 is Test {
         vm.prank(alice);
         mynft.approve(john, tokenId);
 
-        vm.expectEmit(true, false, false, true);
+        vm.expectEmit(true, true, true, false);
         emit Transfered(alice, john, tokenId);
 
         vm.prank(john);
@@ -268,5 +268,103 @@ contract testERC721 is Test {
         mynft.transferFrom(alice, zeroAddress, tokenId);
 
         assertEq(mynft.amountOfNft(alice), aliceAmountBefore);
+    }
+
+    function test_transferFrom_works_on_similar_address_with_approved_condition() public {
+        uint256 tokenId = 5;
+        uint256 aliceAmountBefore = mynft.amountOfNft(alice);
+
+        vm.prank(alice);
+        mynft.approve(alice, tokenId);
+
+        vm.expectEmit(true, true, true, false);
+        emit Transfered(alice, alice, tokenId);
+
+        vm.prank(alice);
+        mynft.transferFrom(alice, alice, tokenId);
+
+        assertEq(mynft.amountOfNft(alice), aliceAmountBefore);
+    }
+
+    function test_transferFrom_reverts_on_similar_address_with_not_approved_condition() public {
+        uint256 tokenId = 5;
+        uint256 aliceAmountBefore = mynft.amountOfNft(alice);
+
+        vm.expectRevert(MyNft.youAreNotOwner.selector);
+
+        vm.prank(alice);
+        mynft.transferFrom(alice, alice, tokenId);
+
+        assertEq(mynft.amountOfNft(alice), aliceAmountBefore);
+    }
+
+    function test_transferFrom_reverts_for_from_address_is_zero_address() public {
+        uint256 tokenId = 5;
+        uint256 aliceAmountBefore = mynft.amountOfNft(alice);
+
+        vm.prank(alice);
+        mynft.approve(john, tokenId);
+
+        vm.expectRevert(MyNft.youDoNotOwnTheToken.selector);
+
+        vm.prank(john);
+        mynft.transferFrom(address(0), alice, tokenId);
+
+        assertEq(mynft.amountOfNft(alice), aliceAmountBefore);
+    }
+
+    function test_transferFrom_emits_an_event() public {
+        uint256 tokenId = 5;
+
+        vm.prank(alice);
+        mynft.approve(john, tokenId);
+
+        vm.expectEmit(true, true, true, false);
+        emit Transfered(alice, john, tokenId);
+
+        vm.prank(john);
+        mynft.transferFrom(alice, john, tokenId);
+    }
+
+    function test_ownerOf_works() public view {
+        // bob owns this tokens from the setUp : 3, 6, 9, 12, 15
+        for (uint256 i = 3; i < 16; i += 3) {
+            assertEq(mynft.ownerOf(i), bob);
+        }
+    }
+
+    function test_ownerOf_on_unkown_id() public view {
+        assertEq(mynft.ownerOf(50), address(0));
+    }
+
+    function test_amountOfNft_works() public view {
+        //amount of nft they own from the setUp each of them own 5;
+        uint256 amountOfNft = 5;
+
+        assertEq(mynft.amountOfNft(alice), amountOfNft);
+        assertEq(mynft.amountOfNft(bel), amountOfNft);
+        assertEq(mynft.amountOfNft(bob), amountOfNft);
+    }
+
+    function test_amountOfNft_on_unknown_owner() public {
+        address unkownOwner = makeAddr("unkownOwner");
+        uint256 amountOfTokenTheUnkownOwnerHave = 0;
+
+        assertEq(mynft.amountOfNft(unkownOwner), amountOfTokenTheUnkownOwnerHave);
+    }
+
+    function test_approvedAddresses_works() public {
+        uint256 tokenId = 2;
+
+        vm.prank(alice);
+        mynft.approve(john, tokenId);
+
+        assertEq(mynft.approvedAddresses(tokenId), john);
+    }
+
+    function test_approvedAddresses_on_unkown_id() public view {
+        uint256 tokenId = 20;
+
+        assertEq(mynft.approvedAddresses(tokenId), address(0));
     }
 }

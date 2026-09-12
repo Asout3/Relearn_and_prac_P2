@@ -76,26 +76,25 @@
       DONE b5:- approvedAddresses(_id) == msg.sender -> pass.
       DONE b6:- _to == address(0) -> cant Send To Zero Address.
       DONE b7:- _to != address(0) -> pass.
-            b8:- input - _from & _to - same address -> with approved condition it should pass.
-            b9:- input - _from & _to - same address -> without being approved reverts youDoNotOwnTheToken.
-            b10:- input - _from & _to - same zero address -> reverts youDoNotOwnTheToken.
-            b11:- input - _from - zero address -> revert youDoNotOwnTheToken.
+      DONE b8:- input - _from & _to - same address -> with approved condition it should pass.
+      DONE b9:- input - _from & _to - same address -> without being approved reverts youDoNotOwnTheToken.
+      DONE b11:- input - _from - zero address -> revert youDoNotOwnTheToken.
 
-            emits an event -> Transfered(_from, _to, _id);
+      DONE emits an event -> Transfered(_from, _to, _id);
 
       2.6 ownerOf():-
             Access:- anyone.
             Inputs:- _id
 
-            b1:- pass make sure it works.
-            b2:- input - _id - unknown id -> returns zero address.
+      DONE b1:- pass make sure it works.
+      DONE b2:- input - _id - unknown id -> returns zero address.
 
       2.7 amountOfNft():-
             Access:- anyone.
             Inputs:- _owner
 
-            b1:- pass make sure it works.
-            b2:- input - _owner - unknown owner address -> returns zero.
+      DONE b1:- pass make sure it works.
+      DONE b2:- input - _owner - unknown owner address -> returns zero.
 
       2.8 approvedAddresses():-
             Access:- anyone.
