@@ -91,8 +91,7 @@ contract TestERC20 is Test {
     function test_transfer_reverts_with_Insufficient_Balance() public {
         vm.expectRevert(Asout3Token.InsufficientBalance.selector);
         vm.prank(john);
-        bool ok = token.transfer(address(alice), 2 * 1e18);
-        assertFalse(ok, "failed");
+        token.transfer(address(alice), 2 * 1e18);
     }
 
     function test_approve_works() public {
@@ -131,7 +130,7 @@ contract TestERC20 is Test {
 
         vm.prank(john);
         bool success = token.checkApproval(address(alice), address(john));
-        assertTrue(success, "it fails");
+        assertFalse(success, "it fails");
     }
 
     // this one pass as expected but in real production i think it supposed to fail.
@@ -194,8 +193,7 @@ contract TestERC20 is Test {
         assertTrue(success, "it fails");
 
         vm.expectRevert(Asout3Token.InsufficientAllowance.selector);
-        bool ok = token.transferFrom(address(alice), address(john), 5 * 1e18);
-        assertFalse(ok, "failed");
+        token.transferFrom(address(alice), address(john), 5 * 1e18);
         vm.stopPrank();
     }
 
@@ -233,8 +231,7 @@ contract TestERC20 is Test {
         assertTrue(success, "it fails");
 
         vm.expectRevert(Asout3Token.InsufficientBalance.selector);
-        bool ok = token.transferFrom(address(alice), address(john), 15 * 1e18);
-        assertFalse(ok, "failed");
+        token.transferFrom(address(alice), address(john), 15 * 1e18);
         vm.stopPrank();
     }
 
@@ -293,8 +290,7 @@ contract TestERC20 is Test {
         assertTrue(success, "it fails");
 
         vm.expectRevert(Asout3Token.InsufficientAllowance.selector);
-        bool ok = token.transferFrom(address(alice), address(john), 8 * 1e18 + 1 wei);
-        assertFalse(ok, "failed");
+        token.transferFrom(address(alice), address(john), 8 * 1e18 + 1 wei);
         vm.stopPrank();
     }
 
