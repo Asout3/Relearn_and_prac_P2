@@ -42,22 +42,22 @@
             Access:- anyone.
             Input:- _to, _id
 
-            b1:- pass -> make sure every thing works.
-            b2:- nftOwner[_id] != msg.sender -> reverts you Do Not Own The Token.
-            b3:- nftOwner[_id] == msg.sender -> pass.
-            b4:- input - _to - zero address  -> pass.
-            b5:- input - _to - msg.sender -> pass.
-            b6:- input - _id - add one wei to a normal number -> idk wt happens but high chance of fail.
+      DONE b1:- pass -> make sure every thing works.
+      DONE b2:- nftOwner[_id] != msg.sender -> reverts you Do Not Own The Token.
+      DONE b3:- nftOwner[_id] == msg.sender -> pass.
+      DONE b4:- input - _to - zero address  -> pass.
+      DONE b5:- input - _to - msg.sender(TO YOUR SELF) -> pass.
+      DONE b6:- input - _id - add one wei to a normal number -> idk wt happens but high chance of fail.
 
-            emits an event -> Approved(msg.sender, _to, _id);
+      DONE emits an event -> Approved(msg.sender, _to, _id);
 
       2.4 transfer():-
             Access:- anyone.
             Input:- _to, _id
 
-            b1:- pass -> make sure every thing works.
-            b2:- nftOwner[_id] != msg.sender -> reverts you Do Not Own The Token.
-            b3:- nftOwner[_id] == msg.sender -> pass.
+      DONE b1:- pass -> make sure every thing works.
+      DONE b2:- nftOwner[_id] != msg.sender -> reverts you Do Not Own The Token.
+      DONE b3:- nftOwner[_id] == msg.sender -> pass.
             b4:- _to == address(0) -> reverts cant Send To Zero Address.
             b5:- _to != address(0) -> pass.
             b7:- input - _to - zero address  -> pass.
