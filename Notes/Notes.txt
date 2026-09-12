@@ -58,25 +58,24 @@
       DONE b1:- pass -> make sure every thing works.
       DONE b2:- nftOwner[_id] != msg.sender -> reverts you Do Not Own The Token.
       DONE b3:- nftOwner[_id] == msg.sender -> pass.
-            b4:- _to == address(0) -> reverts cant Send To Zero Address.
-            b5:- _to != address(0) -> pass.
-            b7:- input - _to - zero address  -> pass.
-            b8:- input - _to - msg.sender -> pass.
-            b9:- input - _id - add one wei to a normal number -> idk wt happens but high chance of fail.
+      DONE b4:- _to == address(0) -> reverts cant Send To Zero Address.
+      DONE b5:- _to != address(0) -> pass.
+      DONE b6:- input - _to - msg.sender -> pass.
+      DONE b7:- input - _id - add one wei to a normal number -> idk wt happens but high chance of fail.
 
-            emits an event -> Transfered(msg.sender, _to, _id);
+      DONE emits an event -> Transfered(msg.sender, _to, _id);
 
       2.5 transferFrom():-
             Access:- anyone.
             Input:- _from, _to, _id
 
-            b1:- pass -> make sure everthing works.
-            b2:- nftOwner[_id] != _from -> reverts you Do Not Own The Token.
-            b3:- nftOwner[_id] == _from -> pass.
-            b4:- approvedAddresses(_id) != msg.sender -> reverts you Are Not Owner.
-            b5:- approvedAddresses(_id) == msg.sender -> pass.
+      DONE b1:- pass -> make sure everthing works.
+      DONE b2:- nftOwner[_id] != _from -> reverts you Do Not Own The Token.
+      DONE b3:- nftOwner[_id] == _from -> pass.
+      DONE b4:- approvedAddresses(_id) != msg.sender -> reverts you Are Not Owner.
+      DONE b5:- approvedAddresses(_id) == msg.sender -> pass.
             b6:- _to == address(0) -> cant Send To Zero Address.
-            b7:- _to != address(0) -> pass.
+      DONE b7:- _to != address(0) -> pass.
             b8:- input - _from & _to - same address -> with approved condition it should pass.
             b9:- input - _from & _to - same address -> without being approved reverts youDoNotOwnTheToken.
             b10:- input - _from & _to - same zero address -> reverts youDoNotOwnTheToken.
