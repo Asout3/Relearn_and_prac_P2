@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.30;
 
+/// @custom:Info This is shitty code it is really bad. But i wrote it long ago and i have become smart enough to see
+///              how bad this code is i guess that is a progress. This is broken code honestly.
+
 /// @title MyNft
 /// @author Mikiyas Yimer
 /// @notice Simple NFT exercise contract made for learning. Do not use this in production.
@@ -67,28 +70,13 @@ contract MyNft {
 
     /// @notice Mints a new NFT to an address.
     /// @dev Only the contract owner can mint. The NFT id starts from 1 and increases after every mint.
-    /// @param to The address that will receive the new NFT.
-    function mint(address to) public onlyOwner {
-        if (to == address(0)) revert cantSendToZeroAddress();
-        nftOwner[id] = to;
-        balanceOf[to] += 1;
-        emit OwnershipTrasfered(address(0), to, id);
+    /// @param _to The address that will receive the new NFT.
+    function mint(address _to) public onlyOwner {
+        if (_to == address(0)) revert cantSendToZeroAddress();
+        nftOwner[id] = _to;
+        balanceOf[_to] += 1;
+        emit OwnershipTrasfered(address(0), _to, id);
         id++;
-    }
-
-    /// @notice Returns the owner of an NFT id.
-    /// @param _id The NFT id to check.
-    /// @return The address that owns the NFT.
-    function ownerOf(uint256 _id) public view returns (address) {
-        return nftOwner[_id];
-    }
-
-    /// @notice Returns how many NFTs an address owns.
-    /// @dev This is basically a helper around the public balanceOf mapping.
-    /// @param _owner The address to check.
-    /// @return The number of NFTs owned by the address.
-    function amountOfNft(address _owner) public view returns (uint256) {
-        return balanceOf[_owner];
     }
 
     /// @notice Transfers ownership of an NFT from one address to another.
@@ -148,6 +136,21 @@ contract MyNft {
         balanceOf[_to] += 1;
 
         emit Transfered(_from, _to, _id);
+    }
+
+    /// @notice Returns the owner of an NFT id.
+    /// @param _id The NFT id to check.
+    /// @return The address that owns the NFT.
+    function ownerOf(uint256 _id) public view returns (address) {
+        return nftOwner[_id];
+    }
+
+    /// @notice Returns how many NFTs an address owns.
+    /// @dev This is basically a helper around the public balanceOf mapping.
+    /// @param _owner The address to check.
+    /// @return The number of NFTs owned by the address.
+    function amountOfNft(address _owner) public view returns (uint256) {
+        return balanceOf[_owner];
     }
 
     /// @notice Returns the approved address for an NFT id.

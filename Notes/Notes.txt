@@ -1,134 +1,116 @@
-1. accorinding to like the main erc-20 spec it should pass like it doesn't treat zero address as such a thing they can send it to zero address so that means they are burning it, who would burn a token that must be expenisve for the one who is sending to zero address so ya that is it.
-2. well as i read from the spec it doesn't stop you from putting the same address from puting the same address on the that same spot right but i personally believe protocols should do some reserach and i know the probablity of someone putting the same address on  those two thing are low so which one is more efficent should we check every time and that is also require gas or should we let them do that and see if it is like expenisve as well but i think we should let them do that.
-3. ownerOf is like owner of that nft and get approved is like same as transferFrom in erc20 whihc gives it approval for that token id so it can do that.
-
-
-
-
 1. STATES the contract can be in:-
-      1.1 Explicit test: 
-            - Nothing explicitly stated.
+      1.1 Explicit state:-
+            - nothing explicityly stated.
 
-      1.2 Implicit test:
-            - Insufficient Balance
-            - sufficient Balance
-            - Insufficient Allowance
-            - sufficient Allowance
-            - Approved
-            - Not Approved
+      1.2 Implicit state:-
+            - owner, non-owner.
+            - cant sent to zero address.
+            - not are not owner.
+            - you don't own the token.
 
-2. FUNCTIONS + what state each touches:-
+2. 2. FUNCTIONS + what state each touches:-
+      
+      2.1 mint():-
+            Access:- only owner.
+            Input:- _to
 
-      2.1 transfer():-
-            Inputs: _to, _amount
-
-     DONE   b1: balanceOf(msg.sender) < _amount  -> reverts Insufficient Balance.
-     DONE   b2: balanceOf(msg.sender) > _amount  -> pass.
-     DONE   b3: balanceOf(msg.sender) == _amount  -> pass.
-     DONE   b4: pass -> balance actually moved. 
-     DONE   b5: input - _amount - zero -> pass.
-     DONE   b6: input - _to - zero address -> pass.
-     DONE   b7: input - _to &  _amount - zero -> pass.
-            
-
-     DONE   emits event -> Transfer(address indexed sender, address indexed receiver, uint256 amount)
-            return true.
-
-      2.2 approve():-
-            Inputs: _spender, _amount
-
-      DONE  b1: pass -> check if approved.
-      DONE  b2: input - _spender - zero -> pass.
-      DONE  b3: input - _amount - zero -> pass.  -- THIS ONE FAILS EVENTUALLY FAILS SO I CAN'T APPROVE ZERO
-      DONE  b4: input - _amount - more than the approver have -> pass.
-      DONE  b5: input - _spender - approver address -> pass.
+      DONE b1:- pass -> make sure it works.
+      DONE b2:- _to == address(0) -> revert. cant Send To ZeroAddress
+      DONE b3:- _to != address(0) -> pass.
 
 
-      DONE   emits event -> Approval(address indexed owner, address indexed spender, uint256 value)
-            returns true.
+      DONE emits an event -> emit OwnershipTrasfered(address(0), _to, id);
 
-      2.3 transferFrom():-
-            Inputs: _from, _to, _amount
+      2.2 transferOwnership():-
+            Access:- anyone.
+            Input:- _from, _to, _id.
 
-      DONE  b1: pass -> make sure it works
-      DONE  b2: allowance[_from][msg.sender] < _amount  -> revert Insufficient Allowance.
-      DONE  b3: allowance[_from][msg.sender] > _amount  -> pass.
-      DONE  b4: allowance[_from][msg.sender] == _amount  -> pass.
-      DONE  b5: balanceOf(_from) < _amount  -> revert Insufficient Balance.
-      DONE  b6: balanceOf(_from) > _amount  -> pass.
-      DONE  b7: balanceOf(_from) == _amount  -> pass.
-      DONE  b8: Input - _from & _to - similar address -> pass.
-      DONE  b9: Input - _amount - 0 -> pass.
-      DONE  b10: Input - _amount - max + 1 wei -> fails.
-      DONE  b11: Input - _from & _to - zero address -> pass.
-      DONE  b12 Input - _from & _to - sender(caller) address -> pass.
-
-            emits event -> Transfer(address indexed sender, address indexed receiver, uint256 amount)
-            return true.
-
-      2.4 checkApproval():-
-            Inputs: _owner, _to
-
-      DONE  b1: pass -> make sure it works.
-      DONE  b2: allowance[_owner][_to] == 0 -> false;
-      DONE  b3: allowance[_owner][_to] != 0 -> true;
-      DONE  b4: Input - _owner & _to - similar address -> false;
-      DONE  b5: Input - _owner & _to - similar caller address -> false;
-
-            return true;
-
-      2.6 totalSupplies():-
-      DONE  returns total supply.
-
-      2.7 balanceOf():-
-            Inputs: _address
-
-      DONE  b1: pass -> make sure it works.
-      DONE  b2: Inputs - _address - zero address -> return 0.
-      DONE  b3: Inputs - _address - random non existent address -> return 0.
- 
+      DONE b1:- pass -> make sure it works.
+      DONE b2:- _from != msg.sender -> reverts you Are Not Owner.
+      DONE b3:- _from == msg.sender -> pass.
+      DONE b4:- nftOwner[_id] != _from -> reverts you Do Not Own The Token.
+      DONE b5:- nftOwner[_id] == _from -> pass.
+      DONE b6:- input - _id - a number plus one wei -> i don't know what happens but mostly fail.
+      DONE b7:- input - _from & _to - are same address -> pass.
+      DONE b8:- input - _from & _to - both are zero address -> revert with you are not owner.
+      DONE b9:- input - _to - are zero address -> pass.
 
 
-Actors    token
+      DONE emits an event -> emit OwnershipTrasfered(_from, _to, _id);
 
-alice      10
-bob        10
-john       0
+      2.3 approve():-
+            Access:- anyone.
+            Input:- _to, _id
 
+            b1:- pass -> make sure every thing works.
+            b2:- nftOwner[_id] != msg.sender -> reverts you Do Not Own The Token.
+            b3:- nftOwner[_id] == msg.sender -> pass.
+            b4:- input - _to - zero address  -> pass.
+            b5:- input - _to - msg.sender -> pass.
+            b6:- input - _id - add one wei to a normal number -> idk wt happens but high chance of fail.
 
+            emits an event -> Approved(msg.sender, _to, _id);
 
-1. State Transition Chains (Your Biggest Gap).
- - You tested every function individually. You never tested what happens when functions compose across multiple calls. This is where real bugs live.
-Mental model: After every state-changing call, ask "what can I do NEXT that depends on this new state?"
+      2.4 transfer():-
+            Access:- anyone.
+            Input:- _to, _id
 
-2. Cross-Function Invariants
-- Single-function tests verify local correctness. They don't verify global properties that must hold across ALL functions.
-Mental model: Write down statements that should ALWAYS be true regardless of call sequence. Then test them
-thend write test about i
+            b1:- pass -> make sure every thing works.
+            b2:- nftOwner[_id] != msg.sender -> reverts you Do Not Own The Token.
+            b3:- nftOwner[_id] == msg.sender -> pass.
+            b4:- _to == address(0) -> reverts cant Send To Zero Address.
+            b5:- _to != address(0) -> pass.
+            b7:- input - _to - zero address  -> pass.
+            b8:- input - _to - msg.sender -> pass.
+            b9:- input - _id - add one wei to a normal number -> idk wt happens but high chance of fail.
 
-3. Adversarial Input Combinations
-- You tested zero addresses and zero amounts separately. You didn't test hostile combinations.
-Mental model: For each function with N parameters, ask "what if an attacker controls ALL inputs simultaneously?"
+            emits an event -> Transfered(msg.sender, _to, _id);
 
+      2.5 transferFrom():-
+            Access:- anyone.
+            Input:- _from, _to, _id
 
+            b1:- pass -> make sure everthing works.
+            b2:- nftOwner[_id] != _from -> reverts you Do Not Own The Token.
+            b3:- nftOwner[_id] == _from -> pass.
+            b4:- approvedAddresses(_id) != msg.sender -> reverts you Are Not Owner.
+            b5:- approvedAddresses(_id) == msg.sender -> pass.
+            b6:- _to == address(0) -> cant Send To Zero Address.
+            b7:- _to != address(0) -> pass.
+            b8:- input - _from & _to - same address -> with approved condition it should pass.
+            b9:- input - _from & _to - same address -> without being approved reverts youDoNotOwnTheToken.
+            b10:- input - _from & _to - same zero address -> reverts youDoNotOwnTheToken.
+            b11:- input - _from - zero address -> revert youDoNotOwnTheToken.
 
+            emits an event -> Transfered(_from, _to, _id);
 
+      2.6 ownerOf():-
+            Access:- anyone.
+            Inputs:- _id
 
+            b1:- pass make sure it works.
+            b2:- input - _id - unknown id -> returns zero address.
 
+      2.7 amountOfNft():-
+            Access:- anyone.
+            Inputs:- _owner
 
+            b1:- pass make sure it works.
+            b2:- input - _owner - unknown owner address -> returns zero.
 
+      2.8 approvedAddresses():-
+            Access:- anyone.
+            Inputs:- _id
 
+            b1:- pass make sure it works.
+            b2:- input - _id - unknown id -> returns zero address.
 
+INVARIANTS (English):
+      THIS IS BROKEN CONTRACT IT IS NOT WORTH THE TIME OF WASTE.
 
+Actors:-
 
-
-
-
-
-
-
-
-
-
-
-
+bel    owner    5 nfts
+alice  non-owner  5 nfts
+bob    non-owner  5 nfts
+john   non-owner  0 nft
