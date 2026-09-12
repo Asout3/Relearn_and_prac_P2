@@ -209,13 +209,13 @@ contract testERC721 is Test {
         mynft.transfer((john), tokenIdToTransfer);
     }
 
-    function test_MyNft_transfer_reverts_on_one_wei_above() public {
+    function test_MyNft_transfer_reverts_on_one_above() public {
         uint256 tokenId = 3;
-        uint256 oneWeiAbove = 1 wei;
+        uint256 oneAbove = 1;
 
         vm.expectRevert(MyNft.youDoNotOwnTheToken.selector);
         vm.prank(alice);
-        mynft.transfer(john, tokenId + oneWeiAbove);
+        mynft.transfer(john, tokenId + oneAbove);
     }
 
     function test_MyNft_transferFrom_works() public {
@@ -238,10 +238,16 @@ contract testERC721 is Test {
     }
 
     function test_MyNft_transfer_reverts_on_youDoNotOwnTheToken() public {
+        // this is redundunt test like if you can't get approved it couldn't pass so like the main source code is like bad.
         uint256 tokenId = 1;
         uint256 aliceAmountBefore = mynft.amountOfNft(alice);
         uint256 johnAmountBefore = mynft.amountOfNft(john);
 
+        vm.expectRevert(MyNft.youDoNotOwnTheToken.selector);
+        vm.prank(alice);
+        mynft.approve(bob, 1);
+
+        vm.prank(bob);
         vm.expectRevert(MyNft.youDoNotOwnTheToken.selector);
         mynft.transferFrom(alice, john, tokenId);
 
@@ -255,6 +261,7 @@ contract testERC721 is Test {
         uint256 johnAmountBefore = mynft.amountOfNft(john);
 
         vm.expectRevert(MyNft.youAreNotOwner.selector);
+        vm.prank(john);
         mynft.transferFrom(alice, john, tokenId);
 
         assertEq(mynft.amountOfNft(john), johnAmountBefore);
@@ -267,11 +274,11 @@ contract testERC721 is Test {
         uint256 aliceAmountBefore = mynft.amountOfNft(alice);
 
         vm.prank(alice);
-        mynft.approve(zeroAddress, tokenId);
+        mynft.approve(john, tokenId);
 
         vm.expectRevert(MyNft.cantSendToZeroAddress.selector);
 
-        vm.prank(zeroAddress);
+        vm.prank(john);
         mynft.transferFrom(alice, zeroAddress, tokenId);
 
         assertEq(mynft.amountOfNft(alice), aliceAmountBefore);

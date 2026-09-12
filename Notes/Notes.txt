@@ -74,7 +74,7 @@
       DONE b3:- nftOwner[_id] == _from -> pass.
       DONE b4:- approvedAddresses(_id) != msg.sender -> reverts you Are Not Owner.
       DONE b5:- approvedAddresses(_id) == msg.sender -> pass.
-            b6:- _to == address(0) -> cant Send To Zero Address.
+      DONE b6:- _to == address(0) -> cant Send To Zero Address.
       DONE b7:- _to != address(0) -> pass.
             b8:- input - _from & _to - same address -> with approved condition it should pass.
             b9:- input - _from & _to - same address -> without being approved reverts youDoNotOwnTheToken.
