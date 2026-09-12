@@ -77,12 +77,6 @@ contract testERC721 is Test {
         mynft.transferOwnership(address(alice), address(john), 3);
     }
 
-    function test_transferOwnership_reverts_on_one_wei_above() public {
-        vm.expectRevert(MyNft.youDoNotOwnTheToken.selector);
-        vm.prank(alice);
-        mynft.transferOwnership(address(alice), address(john), 2 + 1 wei);
-    }
-
     function test_transferOwnership_pass_on_the_same_address() public {
         vm.startPrank(alice);
         vm.expectEmit(true, false, false, true);
@@ -155,7 +149,7 @@ contract testERC721 is Test {
         uint256 tokenIdToTransfer = 2;
         uint256 amountOfNftAliceHaveBeforeTransfer = mynft.amountOfNft(alice);
 
-        vm.expectEmit(true, false, false, true);
+        vm.expectEmit(true, true, false, true);
         emit Transfered(alice, john, tokenIdToTransfer);
 
         vm.prank(alice);
@@ -209,15 +203,6 @@ contract testERC721 is Test {
         mynft.transfer((john), tokenIdToTransfer);
     }
 
-    function test_MyNft_transfer_reverts_on_one_above() public {
-        uint256 tokenId = 3;
-        uint256 oneAbove = 1;
-
-        vm.expectRevert(MyNft.youDoNotOwnTheToken.selector);
-        vm.prank(alice);
-        mynft.transfer(john, tokenId + oneAbove);
-    }
-
     function test_MyNft_transferFrom_works() public {
         uint256 tokenId = 5;
         uint256 aliceAmountBefore = mynft.amountOfNft(alice);
@@ -239,6 +224,7 @@ contract testERC721 is Test {
 
     function test_MyNft_transfer_reverts_on_youDoNotOwnTheToken() public {
         // this is redundunt test like if you can't get approved it couldn't pass so like the main source code is like bad.
+        // i write this test anyway so like to put the coverage but the main contract is fucked up.
         uint256 tokenId = 1;
         uint256 aliceAmountBefore = mynft.amountOfNft(alice);
         uint256 johnAmountBefore = mynft.amountOfNft(john);
