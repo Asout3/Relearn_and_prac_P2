@@ -38,7 +38,7 @@ contract TestWETH9 is Test {
         assertEq(weth.balanceOf(alice), aliceAmountOfDeposit);
     }
 
-    function test_WETH9_deposit_works_on_recive_call() public {
+    function test_WETH9_deposit_works_on_receive_call() public {
         uint256 aliceAmountOfDeposit = 10 ether;
 
         vm.expectEmit(true, false, false, true);
@@ -52,15 +52,15 @@ contract TestWETH9 is Test {
     }
 
     function test_WETH9_deposit_works_on_zero_amount_sent() public {
-        uint256 bobAmoutOfDeposit = 0 ether;
+        uint256 bobAmountOfDeposit = 0 ether;
 
         vm.expectEmit(true, false, false, true);
-        emit Deposit(bob, bobAmoutOfDeposit);
+        emit Deposit(bob, bobAmountOfDeposit);
 
         vm.prank(bob);
-        weth.deposit{value: bobAmoutOfDeposit}();
+        weth.deposit{value: bobAmountOfDeposit}();
 
-        assertEq(weth.balanceOf(bob), bobAmoutOfDeposit);
+        assertEq(weth.balanceOf(bob), bobAmountOfDeposit);
     }
 
     function test_WETH9_deposit_works_max_uint256() public {
@@ -79,7 +79,7 @@ contract TestWETH9 is Test {
 
     function test_WETH9_withdraw_works() public {
         uint256 aliceAmountOfDeposit = 10 ether;
-        uint256 aliceAmoutToWithdraw = 8 * 1e18;
+        uint256 aliceAmountToWithdraw = 8 ether;
 
         vm.expectEmit(true, false, false, true);
         emit Deposit(alice, aliceAmountOfDeposit);
@@ -88,17 +88,17 @@ contract TestWETH9 is Test {
         weth.deposit{value: aliceAmountOfDeposit}();
 
         vm.expectEmit(true, false, false, true);
-        emit Withdrawal(alice, aliceAmoutToWithdraw);
+        emit Withdrawal(alice, aliceAmountToWithdraw);
 
-        weth.withdraw(aliceAmoutToWithdraw);
+        weth.withdraw(aliceAmountToWithdraw);
         vm.stopPrank();
 
-        assertEq(weth.balanceOf(alice), aliceAmountOfDeposit - aliceAmoutToWithdraw);
+        assertEq(weth.balanceOf(alice), aliceAmountOfDeposit - aliceAmountToWithdraw);
     }
 
     function test_WETH9_withdraw_reverts_on_over_withdrawing() public {
         uint256 aliceAmountOfDeposit = 10 ether;
-        uint256 aliceAmoutToWithdraw = 15 * 1e18;
+        uint256 aliceAmountToWithdraw = 15 ether;
 
         vm.expectEmit(true, false, false, true);
         emit Deposit(alice, aliceAmountOfDeposit);
@@ -108,7 +108,7 @@ contract TestWETH9 is Test {
         uint256 balanceAfterDeposit = weth.balanceOf(alice);
 
         vm.expectRevert();
-        weth.withdraw(aliceAmoutToWithdraw);
+        weth.withdraw(aliceAmountToWithdraw);
         vm.stopPrank();
 
         assertEq(weth.balanceOf(alice), balanceAfterDeposit);
@@ -116,7 +116,7 @@ contract TestWETH9 is Test {
 
     function test_WETH9_withdraw_works_on_zero_amount_to_withdraw() public {
         uint256 aliceAmountOfDeposit = 10 ether;
-        uint256 aliceAmoutToWithdraw = 0;
+        uint256 aliceAmountToWithdraw = 0;
 
         vm.expectEmit(true, false, false, true);
         emit Deposit(alice, aliceAmountOfDeposit);
@@ -125,15 +125,15 @@ contract TestWETH9 is Test {
         weth.deposit{value: aliceAmountOfDeposit}();
 
         vm.expectEmit(true, false, false, true);
-        emit Withdrawal(alice, aliceAmoutToWithdraw);
+        emit Withdrawal(alice, aliceAmountToWithdraw);
 
-        weth.withdraw(aliceAmoutToWithdraw);
+        weth.withdraw(aliceAmountToWithdraw);
         vm.stopPrank();
 
-        assertEq(weth.balanceOf(alice), aliceAmountOfDeposit - aliceAmoutToWithdraw);
+        assertEq(weth.balanceOf(alice), aliceAmountOfDeposit - aliceAmountToWithdraw);
     }
 
-    function test_WETH9_withdraw_work_on_zero_for_non_user() public {
+    function test_WETH9_withdraw_works_on_zero_for_non_user() public {
         uint256 amountToWithdraw = 0;
 
         vm.expectEmit(true, false, false, true);
@@ -143,7 +143,7 @@ contract TestWETH9 is Test {
         weth.withdraw(amountToWithdraw);
     }
 
-    function test_WETH9_withdraw_works_withdrawing_uint256_max() public {
+    function test_WETH9_withdraw_reverts_on_uint256_max() public {
         uint256 amountToTransfer = 100 ether;
         uint256 amountToWithdraw = type(uint256).max;
         address yon = makeAddr("yon");
@@ -167,7 +167,7 @@ contract TestWETH9 is Test {
 
     function test_WETH9_withdraw_works_on_full_amount_withdraw() public {
         uint256 aliceAmountOfDeposit = 10 ether;
-        uint256 aliceAmoutToWithdraw = 10 * 1e18;
+        uint256 aliceAmountToWithdraw = 10 ether;
 
         vm.expectEmit(true, false, false, true);
         emit Deposit(alice, aliceAmountOfDeposit);
@@ -176,12 +176,12 @@ contract TestWETH9 is Test {
         weth.deposit{value: aliceAmountOfDeposit}();
 
         vm.expectEmit(true, false, false, true);
-        emit Withdrawal(alice, aliceAmoutToWithdraw);
+        emit Withdrawal(alice, aliceAmountToWithdraw);
 
-        weth.withdraw(aliceAmoutToWithdraw);
+        weth.withdraw(aliceAmountToWithdraw);
         vm.stopPrank();
 
-        assertEq(weth.balanceOf(alice), aliceAmountOfDeposit - aliceAmoutToWithdraw);
+        assertEq(weth.balanceOf(alice), aliceAmountOfDeposit - aliceAmountToWithdraw);
     }
 
     function test_WETH9_totalSupply_works() public {
@@ -227,7 +227,7 @@ contract TestWETH9 is Test {
     }
 
     function test_WETH9_approval_works() public {
-        uint256 amountToApprove = 3 * 1e18;
+        uint256 amountToApprove = 3 ether;
 
         vm.expectEmit(true, true, false, true);
         emit Approval(alice, john, amountToApprove);
@@ -239,7 +239,7 @@ contract TestWETH9 is Test {
     }
 
     function test_WETH9_approval_works_on_zero_address() public {
-        uint256 amountToApprove = 3 * 1e18;
+        uint256 amountToApprove = 3 ether;
 
         vm.startPrank(alice);
 
@@ -282,7 +282,7 @@ contract TestWETH9 is Test {
 
     function test_WETH9_approval_approving_more_than_you_own() public {
         uint256 aliceAmountOfDeposit = 3 ether;
-        uint256 amountToApprove = 5 * 1e18;
+        uint256 amountToApprove = 5 ether;
 
         vm.expectEmit(true, false, false, true);
         emit Deposit(alice, aliceAmountOfDeposit);
@@ -337,7 +337,7 @@ contract TestWETH9 is Test {
         assertEq(weth.balanceOf(john), johnAmountBefore + aliceAmountToTransfer);
     }
 
-    function test_WETH9_transfer_reverts_on_transfering_more_than_you_have() public {
+    function test_WETH9_transfer_reverts_on_transferring_more_than_you_have() public {
         uint256 aliceAmountToDeposit = 10 ether;
         uint256 aliceAmountToTransfer = 15 ether;
         uint256 johnAmountBefore = weth.balanceOf(john);
@@ -354,7 +354,7 @@ contract TestWETH9 is Test {
         assertEq(weth.balanceOf(john), johnAmountBefore);
     }
 
-    function test_WETH9_transfer_reverts_on_transfering_uint256_max() public {
+    function test_WETH9_transfer_reverts_on_transferring_uint256_max() public {
         uint256 aliceAmountToDeposit = 10 ether;
         uint256 aliceAmountToTransfer = type(uint256).max;
         uint256 johnAmountBefore = weth.balanceOf(john);
@@ -407,7 +407,7 @@ contract TestWETH9 is Test {
         assertEq(weth.balanceOf(john), johnAmountBefore + aliceAmountToTransfer);
     }
 
-    function test_WETH9_trasnferFrom_on_calling_from_msg_sender() public {
+    function test_WETH9_transferFrom_on_calling_from_msg_sender() public {
         uint256 aliceAmountToDeposit = 10 ether;
         uint256 aliceAmountToTransfer = 5 ether;
         uint256 johnAmountBefore = weth.balanceOf(john);
@@ -426,7 +426,7 @@ contract TestWETH9 is Test {
         assertEq(weth.balanceOf(john), johnAmountBefore + aliceAmountToTransfer);
     }
 
-    function test_WETH9_trasnferFrom_on_calling_from_non_msg_sender() public {
+    function test_WETH9_transferFrom_on_calling_from_non_msg_sender() public {
         uint256 aliceAmountToDeposit = 10 ether;
         uint256 bobAmountToTransfer = 5 ether;
         uint256 aliceAmountToApprove = 6 ether;
@@ -451,7 +451,7 @@ contract TestWETH9 is Test {
         assertEq(weth.allowance(alice, bob), bobAmountOfApproval - bobAmountToTransfer);
     }
 
-    function test_WETH9_trasnferFrom_reverts_on_withdrawing_more_than_what_they_own() public {
+    function test_WETH9_transferFrom_reverts_on_withdrawing_more_than_what_they_own() public {
         uint256 aliceAmountToDeposit = 10 ether;
         uint256 aliceAmountToTransfer = 15 ether;
         uint256 johnAmountBefore = weth.balanceOf(john);
@@ -468,7 +468,7 @@ contract TestWETH9 is Test {
         assertEq(weth.balanceOf(john), johnAmountBefore);
     }
 
-    function test_WETH9_trasnferFrom_reverts_on_not_enough_approval() public {
+    function test_WETH9_transferFrom_reverts_on_not_enough_approval() public {
         uint256 aliceAmountToDeposit = 10 ether;
         uint256 bobAmountToTransfer = 8 ether;
         uint256 aliceAmountToApprove = 6 ether;
@@ -491,10 +491,10 @@ contract TestWETH9 is Test {
         assertEq(weth.allowance(alice, bob), bobAmountOfApproval);
     }
 
-    function test_WETH9_trasnferFrom_reverts_on_not_enough_money() public {
+    function test_WETH9_transferFrom_reverts_on_not_enough_money() public {
         uint256 aliceAmountToDeposit = 10 ether;
         uint256 bobAmountToTransfer = 17 ether;
-        uint256 aliceAmountToApprove = 6 ether;
+        uint256 aliceAmountToApprove = 20 ether;
         uint256 johnAmountBefore = weth.balanceOf(john);
 
         vm.prank(alice);
@@ -524,18 +524,15 @@ contract TestWETH9 is Test {
         assertEq(weth.balanceOf(john), johnAmountBefore);
     }
 
-    function test_WETH9_transferFrom_pass_when_src_and_dst_are_zero() public {
+    function test_WETH9_transferFrom_pass_when_src_and_dst_and_wad_are_zero() public {
         uint256 bobAmountToTransfer = 0 ether;
-        uint256 johnAmountBefore = weth.balanceOf(john);
 
         vm.expectEmit(true, true, false, true);
-        emit Transfer(address(0), john, bobAmountToTransfer);
-        weth.transferFrom(address(0), john, bobAmountToTransfer);
-
-        assertEq(weth.balanceOf(john), johnAmountBefore);
+        emit Transfer(address(0), address(0), bobAmountToTransfer);
+        weth.transferFrom(address(0), address(0), bobAmountToTransfer);
     }
 
-    function test_WETH9_trasnferFrom_dst_is_zero_address() public {
+    function test_WETH9_transferFrom_dst_is_zero_address() public {
         uint256 aliceAmountToDeposit = 10 ether;
         uint256 aliceAmountToTransfer = 5 ether;
 
@@ -571,7 +568,7 @@ contract TestWETH9 is Test {
         assertEq(weth.balanceOf(john), johnAmountBefore + aliceAmountToTransfer);
     }
 
-    function test_WETH9_balanceOf() public {
+    function test_WETH9_balanceOf() public view {
         assertEq(weth.balanceOf(alice), 0);
     }
 
@@ -580,9 +577,8 @@ contract TestWETH9 is Test {
 
         vm.prank(alice);
         weth.deposit{value: aliceAmountToDeposit}();
-        uint256 aliceAmountAfterDeposit = weth.balanceOf(alice);
 
-        assertEq(weth.balanceOf(alice), aliceAmountAfterDeposit);
+        assertEq(weth.balanceOf(alice), aliceAmountToDeposit);
     }
 
     function test_WETH9_balanceOf_on_withdraw() public {
@@ -615,7 +611,7 @@ contract TestWETH9 is Test {
         assertEq(weth.balanceOf(john), johnbalanceBefore + aliceAmountToTransfer);
     }
 
-    function test_WETH9_allowance() public {
+    function test_WETH9_allowance() public view {
         uint256 currentApproval = 0;
 
         assertEq(weth.allowance(alice, john), currentApproval);

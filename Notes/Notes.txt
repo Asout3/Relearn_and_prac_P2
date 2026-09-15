@@ -70,14 +70,17 @@ transferFrom(address src, address dst, uint256 wad):
       DONE T5: allowance[src][msg.sender] <  wad -> reverts
       DONE T6: Input: src == zero address -> reverts.
       DONE T7: Input: src && dst == zero address -> reverts. ||| this one didn't revert
-      T8: Input: dst == zero address -> pass.
-      T9: Input: wad == zero -> zero.
+      DOEN T8: Input: dst == zero address -> pass.
+      DONE T9: Input: wad == zero -> zero.
 
 
-      emits an event Transfer(src, dst, wad);
+      DONE emits an event Transfer(src, dst, wad);
 
       balanceOf and allowance.
       total supply after withdraw.
+
+
+      NIGGA YOU ARE MAKING MISTAKE YOU NEED TO DO THE INVARIANT AND TEST THEM AND ALSO LIKE THE MATTRIX THING THIS IS IMPORTANT
 
 
 
