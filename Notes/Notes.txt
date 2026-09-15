@@ -63,9 +63,10 @@ transferFrom(address src, address dst, uint256 wad):
       Access: anyone.
       Return: True.
 
-      T1: pass(doesn't satisfy the if) -> make sure every thing works.
-      T2: pass(does satisfy the if) -> make sure every thing works.
-      T2: balanceOf[src] < wad -> reverts.
+      DONE T1: pass(doesn't satisfy the if) -> make sure every thing works.
+      DONE T2: pass(does satisfy the if) -> make sure every thing works.
+      T3: balanceOf[src] < wad -> reverts.
+      T4: balanceOf[src] < wad on not enough approval -> revert.
       T3: Input: src == zero address -> reverts.
       T4: Input: src && dst == zero address -> reverts.
       T5: Input: dst == zero address -> pass.
@@ -73,6 +74,9 @@ transferFrom(address src, address dst, uint256 wad):
 
 
       emits an event Transfer(src, dst, wad);
+
+      balanceOf and allowance.
+      total supply after withdraw.
 
 
 
