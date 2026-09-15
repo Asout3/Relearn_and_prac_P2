@@ -198,6 +198,34 @@ contract TestWETH9 is Test {
         console2.log("Total supply: ", weth.totalSupply());
     }
 
+    function test_WETH9_totalSupply_on_withdraw() public {
+        uint256 aliceDeposit = 5 ether;
+        uint256 aliceAmountToWithdraw = 3 ether;
+
+        vm.startPrank(alice);
+        weth.deposit{value: aliceDeposit}();
+
+        weth.withdraw(aliceAmountToWithdraw);
+        vm.stopPrank();
+
+        assertEq(weth.totalSupply(), aliceDeposit - aliceAmountToWithdraw);
+        console2.log("Total supply: ", weth.totalSupply());
+    }
+
+    function test_WETH9_totalSupply_on_transfer() public {
+        uint256 aliceDeposit = 5 ether;
+        uint256 aliceAmountTransferToBob = 3 ether;
+
+        vm.startPrank(alice);
+        weth.deposit{value: aliceDeposit}();
+
+        weth.transfer(john, aliceAmountTransferToBob);
+        vm.stopPrank();
+
+        assertEq(weth.totalSupply(), aliceDeposit);
+        console2.log("Total supply: ", weth.totalSupply());
+    }
+
     function test_WETH9_approval_works() public {
         uint256 amountToApprove = 3 * 1e18;
 
@@ -421,6 +449,205 @@ contract TestWETH9 is Test {
         assertEq(weth.balanceOf(alice), aliceBalanceAfterDeposit - bobAmountToTransfer);
         assertEq(weth.balanceOf(john), johnAmountBefore + bobAmountToTransfer);
         assertEq(weth.allowance(alice, bob), bobAmountOfApproval - bobAmountToTransfer);
+    }
+
+    function test_WETH9_trasnferFrom_reverts_on_withdrawing_more_than_what_they_own() public {
+        uint256 aliceAmountToDeposit = 10 ether;
+        uint256 aliceAmountToTransfer = 15 ether;
+        uint256 johnAmountBefore = weth.balanceOf(john);
+
+        vm.startPrank(alice);
+        weth.deposit{value: aliceAmountToDeposit}();
+        uint256 aliceBalanceAfterDeposit = weth.balanceOf(alice);
+
+        vm.expectRevert();
+        weth.transferFrom(alice, john, aliceAmountToTransfer);
+        vm.stopPrank();
+
+        assertEq(weth.balanceOf(alice), aliceBalanceAfterDeposit);
+        assertEq(weth.balanceOf(john), johnAmountBefore);
+    }
+
+    function test_WETH9_trasnferFrom_reverts_on_not_enough_approval() public {
+        uint256 aliceAmountToDeposit = 10 ether;
+        uint256 bobAmountToTransfer = 8 ether;
+        uint256 aliceAmountToApprove = 6 ether;
+        uint256 johnAmountBefore = weth.balanceOf(john);
+
+        vm.prank(alice);
+        weth.deposit{value: aliceAmountToDeposit}();
+        uint256 aliceBalanceAfterDeposit = weth.balanceOf(alice);
+
+        vm.prank(alice);
+        weth.approve(bob, aliceAmountToApprove);
+        uint256 bobAmountOfApproval = weth.allowance(alice, bob);
+
+        vm.expectRevert();
+        vm.prank(bob);
+        weth.transferFrom(alice, john, bobAmountToTransfer);
+
+        assertEq(weth.balanceOf(alice), aliceBalanceAfterDeposit);
+        assertEq(weth.balanceOf(john), johnAmountBefore);
+        assertEq(weth.allowance(alice, bob), bobAmountOfApproval);
+    }
+
+    function test_WETH9_trasnferFrom_reverts_on_not_enough_money() public {
+        uint256 aliceAmountToDeposit = 10 ether;
+        uint256 bobAmountToTransfer = 17 ether;
+        uint256 aliceAmountToApprove = 6 ether;
+        uint256 johnAmountBefore = weth.balanceOf(john);
+
+        vm.prank(alice);
+        weth.deposit{value: aliceAmountToDeposit}();
+        uint256 aliceBalanceAfterDeposit = weth.balanceOf(alice);
+
+        vm.prank(alice);
+        weth.approve(bob, aliceAmountToApprove);
+        uint256 bobAmountOfApproval = weth.allowance(alice, bob);
+
+        vm.expectRevert();
+        vm.prank(bob);
+        weth.transferFrom(alice, john, bobAmountToTransfer);
+
+        assertEq(weth.balanceOf(alice), aliceBalanceAfterDeposit);
+        assertEq(weth.balanceOf(john), johnAmountBefore);
+        assertEq(weth.allowance(alice, bob), bobAmountOfApproval);
+    }
+
+    function test_WETH9_transferFrom_reverts_when_src_is_zero_address() public {
+        uint256 bobAmountToTransfer = 17 ether;
+        uint256 johnAmountBefore = weth.balanceOf(john);
+
+        vm.expectRevert();
+        weth.transferFrom(address(0), john, bobAmountToTransfer);
+
+        assertEq(weth.balanceOf(john), johnAmountBefore);
+    }
+
+    function test_WETH9_transferFrom_pass_when_src_and_dst_are_zero() public {
+        uint256 bobAmountToTransfer = 0 ether;
+        uint256 johnAmountBefore = weth.balanceOf(john);
+
+        vm.expectEmit(true, true, false, true);
+        emit Transfer(address(0), john, bobAmountToTransfer);
+        weth.transferFrom(address(0), john, bobAmountToTransfer);
+
+        assertEq(weth.balanceOf(john), johnAmountBefore);
+    }
+
+    function test_WETH9_trasnferFrom_dst_is_zero_address() public {
+        uint256 aliceAmountToDeposit = 10 ether;
+        uint256 aliceAmountToTransfer = 5 ether;
+
+        vm.startPrank(alice);
+        weth.deposit{value: aliceAmountToDeposit}();
+        uint256 aliceBalanceAfterDeposit = weth.balanceOf(alice);
+
+        vm.expectEmit(true, true, false, true);
+        emit Transfer(alice, address(0), aliceAmountToTransfer);
+
+        weth.transferFrom(alice, address(0), aliceAmountToTransfer);
+        vm.stopPrank();
+
+        assertEq(weth.balanceOf(alice), aliceBalanceAfterDeposit - aliceAmountToTransfer);
+    }
+
+    function test_WETH9_transferFrom_wad_is_zero() public {
+        uint256 aliceAmountToDeposit = 10 ether;
+        uint256 aliceAmountToTransfer = 0;
+        uint256 johnAmountBefore = weth.balanceOf(john);
+
+        vm.startPrank(alice);
+        weth.deposit{value: aliceAmountToDeposit}();
+        uint256 aliceBalanceAfterDeposit = weth.balanceOf(alice);
+
+        vm.expectEmit(true, true, false, true);
+        emit Transfer(alice, john, aliceAmountToTransfer);
+
+        weth.transferFrom(alice, john, aliceAmountToTransfer);
+        vm.stopPrank();
+
+        assertEq(weth.balanceOf(alice), aliceBalanceAfterDeposit - aliceAmountToTransfer);
+        assertEq(weth.balanceOf(john), johnAmountBefore + aliceAmountToTransfer);
+    }
+
+    function test_WETH9_balanceOf() public {
+        assertEq(weth.balanceOf(alice), 0);
+    }
+
+    function test_WETH9_balanceOf_on_deposit() public {
+        uint256 aliceAmountToDeposit = 6 ether;
+
+        vm.prank(alice);
+        weth.deposit{value: aliceAmountToDeposit}();
+        uint256 aliceAmountAfterDeposit = weth.balanceOf(alice);
+
+        assertEq(weth.balanceOf(alice), aliceAmountAfterDeposit);
+    }
+
+    function test_WETH9_balanceOf_on_withdraw() public {
+        uint256 aliceAmountToDeposit = 6 ether;
+        uint256 aliceAmountToWithdraw = 3 ether;
+
+        vm.startPrank(alice);
+        weth.deposit{value: aliceAmountToDeposit}();
+        uint256 aliceAmountAfterDeposit = weth.balanceOf(alice);
+
+        weth.withdraw(aliceAmountToWithdraw);
+        vm.stopPrank();
+
+        assertEq(weth.balanceOf(alice), aliceAmountAfterDeposit - aliceAmountToWithdraw);
+    }
+
+    function test_WETH9_balanceOf_on_transfer() public {
+        uint256 aliceAmountToDeposit = 6 ether;
+        uint256 aliceAmountToTransfer = 3 ether;
+        uint256 johnbalanceBefore = weth.balanceOf(john);
+
+        vm.startPrank(alice);
+        weth.deposit{value: aliceAmountToDeposit}();
+        uint256 aliceAmountAfterDeposit = weth.balanceOf(alice);
+
+        weth.transfer(john, aliceAmountToTransfer);
+        vm.stopPrank();
+
+        assertEq(weth.balanceOf(alice), aliceAmountAfterDeposit - aliceAmountToTransfer);
+        assertEq(weth.balanceOf(john), johnbalanceBefore + aliceAmountToTransfer);
+    }
+
+    function test_WETH9_allowance() public {
+        uint256 currentApproval = 0;
+
+        assertEq(weth.allowance(alice, john), currentApproval);
+    }
+
+    function test_WETH9_allowance_approved() public {
+        uint256 aliceAmountToDeposit = 10 ether;
+        uint256 amountToApprove = 5 ether;
+
+        vm.prank(alice);
+        weth.deposit{value: aliceAmountToDeposit}();
+
+        vm.prank(alice);
+        weth.approve(john, amountToApprove);
+
+        assertEq(weth.allowance(alice, john), amountToApprove);
+    }
+
+    function test_WETH9_allowance_reduce_approval() public {
+        uint256 aliceAmountToDeposit = 10 ether;
+        uint256 amountToApprove = 5 ether;
+        uint256 newApproval = 3 ether;
+
+        vm.startPrank(alice);
+        weth.deposit{value: aliceAmountToDeposit}();
+
+        weth.approve(john, amountToApprove);
+
+        weth.approve(john, newApproval);
+        vm.stopPrank();
+
+        assertEq(weth.allowance(alice, john), newApproval);
     }
 }
 

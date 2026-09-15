@@ -65,12 +65,13 @@ transferFrom(address src, address dst, uint256 wad):
 
       DONE T1: pass(doesn't satisfy the if) -> make sure every thing works.
       DONE T2: pass(does satisfy the if) -> make sure every thing works.
-      T3: balanceOf[src] < wad -> reverts.
-      T4: balanceOf[src] < wad on not enough approval -> revert.
-      T3: Input: src == zero address -> reverts.
-      T4: Input: src && dst == zero address -> reverts.
-      T5: Input: dst == zero address -> pass.
-      T6: Input: wad == zero -> zero.
+      DONE T3: balanceOf[src] < wad -> reverts.
+      DONE T4: balanceOf[src] < wad on not enough approval -> revert.
+      DONE T5: allowance[src][msg.sender] <  wad -> reverts
+      DONE T6: Input: src == zero address -> reverts.
+      DONE T7: Input: src && dst == zero address -> reverts. ||| this one didn't revert
+      T8: Input: dst == zero address -> pass.
+      T9: Input: wad == zero -> zero.
 
 
       emits an event Transfer(src, dst, wad);
