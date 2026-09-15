@@ -451,7 +451,7 @@ contract TestWETH9 is Test {
         assertEq(weth.allowance(alice, bob), bobAmountOfApproval - bobAmountToTransfer);
     }
 
-    function test_WETH9_transferFrom_reverts_on_withdrawing_more_than_what_they_own() public {
+    function test_WETH9_transferFrom_reverts_on_transferring_more_than_what_they_own() public {
         uint256 aliceAmountToDeposit = 10 ether;
         uint256 aliceAmountToTransfer = 15 ether;
         uint256 johnAmountBefore = weth.balanceOf(john);
@@ -598,7 +598,7 @@ contract TestWETH9 is Test {
     function test_WETH9_balanceOf_on_transfer() public {
         uint256 aliceAmountToDeposit = 6 ether;
         uint256 aliceAmountToTransfer = 3 ether;
-        uint256 johnbalanceBefore = weth.balanceOf(john);
+        uint256 johnBalanceBefore = weth.balanceOf(john);
 
         vm.startPrank(alice);
         weth.deposit{value: aliceAmountToDeposit}();
@@ -608,7 +608,7 @@ contract TestWETH9 is Test {
         vm.stopPrank();
 
         assertEq(weth.balanceOf(alice), aliceAmountAfterDeposit - aliceAmountToTransfer);
-        assertEq(weth.balanceOf(john), johnbalanceBefore + aliceAmountToTransfer);
+        assertEq(weth.balanceOf(john), johnBalanceBefore + aliceAmountToTransfer);
     }
 
     function test_WETH9_allowance() public view {
@@ -644,6 +644,27 @@ contract TestWETH9 is Test {
         vm.stopPrank();
 
         assertEq(weth.allowance(alice, john), newApproval);
+    }
+
+    function test_WETH9_transferFrom_infinity_approval() public {
+        uint256 aliceAmountToDeposit = 10 ether;
+        uint256 bobTransferFrom = 4 ether;
+        uint256 johnBalanceBefore = weth.balanceOf(john);
+        uint256 max = type(uint256).max;
+
+        vm.startPrank(alice);
+        weth.deposit{value: aliceAmountToDeposit}();
+        uint256 aliceBalanceAfterDeposit = weth.balanceOf(alice);
+
+        weth.approve(bob, max);
+        vm.stopPrank();
+
+        vm.prank(bob);
+        weth.transferFrom(alice, john, bobTransferFrom);
+
+        assertEq(weth.allowance(alice, bob), max);
+        assertEq(weth.balanceOf(alice), aliceBalanceAfterDeposit - bobTransferFrom);
+        assertEq(weth.balanceOf(john), johnBalanceBefore + bobTransferFrom);
     }
 }
 
