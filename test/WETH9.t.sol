@@ -24,6 +24,7 @@ contract TestWETH9 is Test {
     event Deposit(address indexed dst, uint256 wad);
     event Withdrawal(address indexed src, uint256 wad);
     event Approval(address indexed src, address indexed guy, uint256 wad);
+    event Transfer(address indexed src, address indexed dst, uint256 wad);
 
     function test_WETH9_deposit_works() public {
         uint256 aliceAmountOfDeposit = 10 ether;
@@ -105,7 +106,6 @@ contract TestWETH9 is Test {
         vm.startPrank(alice);
         weth.deposit{value: aliceAmountOfDeposit}();
         uint256 balanceAfterDeposit = weth.balanceOf(alice);
-
 
         vm.expectRevert();
         weth.withdraw(aliceAmoutToWithdraw);
@@ -224,7 +224,6 @@ contract TestWETH9 is Test {
         assertEq(weth.allowance(alice, address(0)), amountToApprove);
     }
 
-
     function test_WETH9_approval_works_on_zero_address_and_zero_amount() public {
         uint256 amountToApprove = 0;
 
@@ -290,5 +289,96 @@ contract TestWETH9 is Test {
 
         assertEq(weth.allowance(alice, john), amountToApprove);
     }
+
+    function test_WETH9_transfer_works() public {
+        uint256 aliceAmountToDeposit = 10 ether;
+        uint256 aliceAmountToTransfer = 3 ether;
+        uint256 johnAmountBefore = weth.balanceOf(john);
+
+        vm.startPrank(alice);
+        weth.deposit{value: aliceAmountToDeposit}();
+        uint256 aliceBalanceAfterDeposit = weth.balanceOf(alice);
+
+        vm.expectEmit(true, true, false, true);
+        emit Transfer(alice, john, aliceAmountToTransfer);
+
+        weth.transfer(john, aliceAmountToTransfer);
+        vm.stopPrank();
+
+        assertEq(weth.balanceOf(alice), aliceBalanceAfterDeposit - aliceAmountToTransfer);
+        assertEq(weth.balanceOf(john), johnAmountBefore + aliceAmountToTransfer);
+    }
+
+    function test_WETH9_transfer_reverts_on_transfering_more_than_you_have() public {
+        uint256 aliceAmountToDeposit = 10 ether;
+        uint256 aliceAmountToTransfer = 15 ether;
+        uint256 johnAmountBefore = weth.balanceOf(john);
+
+        vm.startPrank(alice);
+        weth.deposit{value: aliceAmountToDeposit}();
+        uint256 aliceBalanceAfterDeposit = weth.balanceOf(alice);
+
+        vm.expectRevert();
+        weth.transfer(john, aliceAmountToTransfer);
+        vm.stopPrank();
+
+        assertEq(weth.balanceOf(alice), aliceBalanceAfterDeposit);
+        assertEq(weth.balanceOf(john), johnAmountBefore);
+    }
+
+    function test_WETH9_transfer_reverts_on_transfering_uint256_max() public {
+        uint256 aliceAmountToDeposit = 10 ether;
+        uint256 aliceAmountToTransfer = type(uint256).max;
+        uint256 johnAmountBefore = weth.balanceOf(john);
+
+        vm.startPrank(alice);
+        weth.deposit{value: aliceAmountToDeposit}();
+        uint256 aliceBalanceAfterDeposit = weth.balanceOf(alice);
+
+        vm.expectRevert();
+        weth.transfer(john, aliceAmountToTransfer);
+        vm.stopPrank();
+
+        assertEq(weth.balanceOf(alice), aliceBalanceAfterDeposit);
+        assertEq(weth.balanceOf(john), johnAmountBefore);
+    }
+
+    function test_WETH9_transfer_to_zero_address() public {
+        uint256 aliceAmountToDeposit = 10 ether;
+        uint256 aliceAmountToTransfer = 5 ether;
+
+        vm.startPrank(alice);
+        weth.deposit{value: aliceAmountToDeposit}();
+        uint256 aliceBalanceAfterDeposit = weth.balanceOf(alice);
+
+        vm.expectEmit(true, true, false, true);
+        emit Transfer(alice, address(0), aliceAmountToTransfer);
+
+        weth.transfer(address(0), aliceAmountToTransfer);
+        vm.stopPrank();
+
+        assertEq(weth.balanceOf(alice), aliceBalanceAfterDeposit - aliceAmountToTransfer);
+    }
+
+    function test_WETH9_transfer_zero_amount() public {
+        uint256 aliceAmountToDeposit = 10 ether;
+        uint256 aliceAmountToTransfer = 0;
+        uint256 johnAmountBefore = weth.balanceOf(john);
+
+        vm.startPrank(alice);
+        weth.deposit{value: aliceAmountToDeposit}();
+        uint256 aliceBalanceAfterDeposit = weth.balanceOf(alice);
+
+        vm.expectEmit(true, true, false, true);
+        emit Transfer(alice, john, aliceAmountToTransfer);
+
+        weth.transfer(john, aliceAmountToTransfer);
+        vm.stopPrank();
+
+        assertEq(weth.balanceOf(alice), aliceBalanceAfterDeposit - aliceAmountToTransfer);
+        assertEq(weth.balanceOf(john), johnAmountBefore + aliceAmountToTransfer);
+    }
+
+
 }
 

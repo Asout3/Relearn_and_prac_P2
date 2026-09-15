@@ -50,13 +50,13 @@ transfer(address dst, uint256 wad):
       Access: anyone.
       Return: True.
 
-      T1: pass -> make sure it works.
-      T2: Input: wad == more than it have -> revert.
-      T3: Input: wad == type(uint256).max -> revert.
-      T4: Input: dst == zero address -> pass.
-      T5: Input: wad == zero -> pass.
+      DONE T1: pass -> make sure it works.
+      DONE T2: Input: wad == more than it have -> revert.
+      DONE T3: Input: wad == type(uint256).max -> revert.
+      DONE T4: Input: dst == zero address -> pass.
+      DONE T5: Input: wad == zero -> pass.
 
-      emits an event Transfer(src, dst, wad);
+      DONE emits an event Transfer(src, dst, wad);
 
 transferFrom(address src, address dst, uint256 wad): 
       Input: the source address, the destination address and the amount of token we send.
