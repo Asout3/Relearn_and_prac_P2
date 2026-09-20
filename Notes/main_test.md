@@ -149,6 +149,28 @@ i think it is done i should continue i feel like idiot honest like really is thi
 
 
 
+---
+here i will write the thing that i learned and things that i feel important.
+
+1. make sure you prepare the before and after setUp and then record the befores then do ur shit then do it with the before like when u do it you just do like add or deduct like before + 3 or before - 3 like things like that okay make sure of that.
+2. When i am doing like math formual or something similar to it i should never use the formula from the contract because the formula is from the contract and the system will do it right for assertion i have to do it by my self with had or where ever and put the number hardcoded so the reason for that is like there might be something wrong the formula might be wrong that is very less likely and also there might be something wrong any where so i should put the correct answer with ma hand when it does some compliacted shit.
+3. For every numeric input, test three values:
+
+values   What it proves
+n - 1       Just below the limit — should pass or fail cleanly
+n           Exactly at the limit
+n + 1       Just above — should fail or pass cleanly
+
+Example: a function that requires amount <= balance.
+function test_Boundary_BalanceMinus1() public { ... }  // pass
+function test_Boundary_ExactBalance() public { ... }   // pass
+function test_Boundary_BalancePlus1() public { ... }   // revert
+
+
+
+
+
+
 
 
 
