@@ -4,6 +4,12 @@ pragma solidity ^0.8.30;
 import "./Interfaces/IUniswapV2ERC20.sol";
 import "./Libraries/SafeMath.sol";
 
+/**
+ * @title UniswapV2ERC20 (modified)
+ * @notice Derived from Uniswap V2 (https://github.com/Uniswap/v2-core),
+ *         originally licensed under GPL-3.0.
+ * @dev Modified for Solidity ^0.8.30 compatibility. Protocol logic unchanged.
+ */
 contract UniswapV2ERC20 is IUniswapV2ERC20 {
     using SafeMath for uint256;
 

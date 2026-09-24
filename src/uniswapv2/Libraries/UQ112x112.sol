@@ -6,6 +6,12 @@ pragma solidity ^0.8.30;
 // range: [0, 2**112 - 1]
 // resolution: 1 / 2**112
 
+/**
+ * @title UQ112x112 (modified)
+ * @notice Derived from Uniswap V2 (https://github.com/Uniswap/v2-core),
+ *         originally licensed under GPL-3.0.
+ * @dev Modified for Solidity ^0.8.30 compatibility. Protocol logic unchanged.
+ */
 library UQ112x112 {
     uint224 constant Q112 = 2 ** 112;
 

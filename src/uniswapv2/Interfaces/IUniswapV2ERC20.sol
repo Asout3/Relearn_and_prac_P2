@@ -1,6 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.30;
 
+/**
+ * @title IUniswapV2ERC20 (modified)
+ * @notice Derived from Uniswap V2 (https://github.com/Uniswap/v2-core),
+ *         originally licensed under GPL-3.0.
+ * @dev Modified for Solidity ^0.8.30 compatibility. Protocol logic unchanged.
+ */
 interface IUniswapV2ERC20 {
     event Approval(address indexed owner, address indexed spender, uint256 value);
     event Transfer(address indexed from, address indexed to, uint256 value);

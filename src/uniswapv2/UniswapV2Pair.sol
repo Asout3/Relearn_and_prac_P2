@@ -9,6 +9,12 @@ import "./Interfaces/IERC20.sol";
 import "./Interfaces/IUniswapV2Factory.sol";
 import "./Interfaces/IUniswapV2Callee.sol";
 
+/**
+ * @title UniswapV2Pair (modified)
+ * @notice Derived from Uniswap V2 (https://github.com/Uniswap/v2-core),
+ *         originally licensed under GPL-3.0.
+ * @dev Modified for Solidity ^0.8.30 compatibility. Protocol logic unchanged.
+ */
 contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
     using SafeMath for uint256;
     using UQ112x112 for uint224;

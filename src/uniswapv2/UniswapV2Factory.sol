@@ -4,6 +4,12 @@ pragma solidity ^0.8.30;
 import "./Interfaces/IUniswapV2Factory.sol";
 import "./UniswapV2Pair.sol";
 
+/**
+ * @title UniswapV2Factory (modified)
+ * @notice Derived from Uniswap V2 (https://github.com/Uniswap/v2-core),
+ *         originally licensed under GPL-3.0.
+ * @dev Modified for Solidity ^0.8.30 compatibility. Protocol logic unchanged.
+ */
 contract UniswapV2Factory is IUniswapV2Factory {
     address public feeTo;
     address public feeToSetter;

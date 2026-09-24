@@ -3,6 +3,12 @@ pragma solidity ^0.8.30;
 
 import "./IUniswapV2ERC20.sol";
 
+/**
+ * @title IUniswapV2Pair (modified)
+ * @notice Derived from Uniswap V2 (https://github.com/Uniswap/v2-core),
+ *         originally licensed under GPL-3.0.
+ * @dev Modified for Solidity ^0.8.30 compatibility. Protocol logic unchanged.
+ */
 interface IUniswapV2Pair is IUniswapV2ERC20 {
     event Mint(address indexed sender, uint256 amount0, uint256 amount1);
     event Burn(address indexed sender, uint256 amount0, uint256 amount1, address indexed to);
