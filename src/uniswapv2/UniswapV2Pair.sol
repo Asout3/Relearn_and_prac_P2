@@ -83,7 +83,7 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
     // if fee is on, mint liquidity equivalent to 1/6th of the growth in sqrt(k)
     function _mintFee(uint112 _reserve0, uint112 _reserve1) private returns (bool feeOn) {
         address feeTo = IUniswapV2Factory(factory).feeTo();
-        feeOn = feeTo != address(0);
+        feeOn = feeTo != address(0); // if(feeTo != address(0)) feeOn = true;
         uint256 _kLast = kLast; // gas savings
         if (feeOn) {
             if (_kLast != 0) {

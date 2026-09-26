@@ -1,5 +1,289 @@
-Today goals:
+alright now i am going to write my explaing on the uniswap v2 pair.
 
-1. make it compile.
-2. understand the codebase deep dive.
-3. write a plan for the test suite( which also include creating invaritants.).
+so like as you know i have updated it to like version ^0.8.30 there might be some change but it compiles thats what matters.
+okay lets start. i am not gonna like explain each variable maybe i can go down and like explain them at then end or whatever but i go down okay.
+
+so at first you get modifer function it does like unlocked like if it open it is 1 if its not other number so like what it does is like lock the function while executing and after finishing executing it unlocks it.
+
+the first function in here is getReserve() it is a view function returning reserve0, reserve1, blocktimestamplast. so the reason they do it is like to save gas so as you know or i will explain this contract does all of the thing it can to save as much as possible and it did amezing job saving the gas and it is really amezing thing they did so let me explain the reason they use the function so reading from the storage is like sload which is around 2300 gas and reading it 3 times is kinda waste so the function read them one and put them in stack which is readen when the function is called so that saves them a lot of gas. so local varaibles is puted on stack.
+
+the next function is _safeTransfer() and it is a transfer function basically, so like in the input we input - token, to, value. so like token is like the address of the token we are calling the transfer function as you can see we call - token.call so we are calling transfer. but we are not calling .transfer for free we are doing giving all the data for the reason of compatability because tokens are different like if we just do .transfer(to, value) the our contract expects bool and some tokens doesn't return noting or a random data so that is the reason we does like this okay and also it save a little bit of gas but very little. like we provided the function selector which we saved as satae variable constant and priviate so we provided the funciton selector, to and value. then we do our check using the bool if it pass and the data check which we get in retrun.  
+
+so the next function is not really a function just constructor which makes the factor as msg.sender.
+
+okay the next function is initailize this function is called by the factory when the pair is deployed. and it can only be called by the facotry and also it set the token0 and token1 like the pair the factory function sets it puting the two tokens and they are never changed like what it does is like weth to usdc, dai to what ever but like what ever the erc20 token is okay.
+
+so th next function is like important function. like this are the most important functions. here are the heart of the pair functions: _update, _mintFee, mint, burn, swap.
+
+okay lets start with _update.
+so the update function is called by this functions - mint, burn, swap, sync.
+so like it updates some importants staffs like keep them upto date lets see what it does.
+so it accesst four inputs as an input and this are the things - balance0, balance1, reserve0, reserve1. so like here is something that i need to explain so the datatype for this are for balance0 and balance1 the data type is uint256 and for the reserve0 and reserve1 are uint112 and there is a good reason for it let me explain first about the reserve reserves are really important variables which they contain the reserve token for that function for reserve0 - it contains token0 and same for reserve1 - token1  it is used for all the math in the whole contract. and why do we do it in 112 the reason is for gas optimization mainly atleast there are thing important things which they try to do blockTimestampLast they reduced them into smaller bits and try to put them in one slot so they can save more gas and aslo uint112 is enough for the money cuz no amount of pool or person could reach the max of uint112 so they did like do like reserve0, reserve1 and blockTimestampLast data type are uint112, uint112 and uint32 this all can fit in one slot so they can save gas. and balance0 and balance1 are uint256 and they are from other token actual balance like the real balance that token have the actual like they obtain balance directly from token by pair address so they get real time data of the amount of token that the pair have for that specific token. like 
+balance0 could be 1100 and reserve0 could be 1000 that is normal and they sync them we will see them later.
+so the first thing the _update does is to check if the balance0 and balance1 can fit into the reserve0 and 1 so it makes sure the uint256 balance can be fitted in the uint112 reserve. then the next line does like convert the timestamp into uint32 shit it doesnt nothing but take the current time stamp and make it fit in uint32 format then it check - timeElapsed > 0 && _reserve0 != 0 && _reserve1 != 0  so what this checks is like is there any time elapsed time elsaped is like time timeelapesd - timeelapsedlast so its like now - last time it is updated so you get how much time it has passed since the last update. and it check if timeElapsed > 0 if it is zero there is no time passed so no update to make. so it also check _reserve0 != 0 if they are zero the pool has no token to do so there is no maths to do so. so if the three conditions are true it does this calculation: price0CumulativeLast += uint256(UQ112x112.encode(_reserve1).uqdiv(_reserve0)) * timeElapsed; -> this is like pricecumulaitve0 = pricecumulative + price * time passed; this is it like the used some libraries to avoid overflow and some shit right so like what this formula does is like price * timepassed is like used for twap which twap stands for time wieghted average price so we take a price and check for how long it lasted and use it to do the maths drive price right we use it for that puross and we do like do that multiplication and add it to the cumulative variable addin on it stacking it up and we use it to drive price later. we do the same for token 0 and token 1 so that is what we does if the condition met. after that it updates the states whcih is the reserve and time stamp and emit sync  to like we use sync function to make reserve and balance equal make them equal and as i said we change the balance to uint112 in the reserve i told you why we cast it 112 before so that is what update does.
+
+
+Okay the next function is _mintfee() it mints 1/6 of the growth in sqrt(k). Let me explain what it does. First it gets the feeTo address which is all the address where all the fee money which is the lp token is putted it is not like they cut thr fee and take that money to other place they do like cut the fee and the fee stays at that pool which is benefit for the lp provider which when the fee grows the lp value also increase. Then it checks it sets feeOn true if feeTo != address(0) tbis means the fee address is normal address and doesnt get burns that means fee is on. The it does a assign KLast which is like X * Y = K so like the reason it assign it in this thing is like to save gas as I said normal read from a variable is like 2300 gas and in this function it is called multiple time so that is a lot of time like for this function its called around 3 times so it become 3 * 2300 so it is around 2300 so it becomes 6900 gas so we called it once so 6900 - 2300 = 4300 gas and that is alot of gas we save this much gas by only declaring a local variable which stays on the stack. Then we continue with multiple of if statement the first one checks if fee is on  it checks again if _KLast isnt zero if that is true it does a maths of like rootK = sqrt(reserve0 * reserve1) which gives K. And then we do the Klast then we put it in sqrt. Then we do our check which is if rootK is greater then the last root k then. If that is true it does like find the numerator and denominator. It find the numerator by totalsupply * (rootK - rootKLast) and for denominator - (rootk * 5) + rootKlast. Then it find its liquidity by numerator/denominator. Then if liquidity greater than 0 we gonna mint the liquidity to the feeto address. Then there is else if at the end what it does is is like if klast isnt 0 make it 0.
+
+
+
+now lets see the mint function: so the mint function is used for minting a new lp token when someone provide an lp let me walk you through the code. first it get the reserve0 and reserve1 you saw like this is like good way of gas optimization thats the reason the getReserve funtion existed. then it gets the current state of balacne0 and balance1 like the real current state then it state then it does this token0 = balance0 - reserve1 and does the same for token1 so if you ask why it does this and the answer is because to know the change or involvemtn like if the reserve0 is like 1000 and balance0 is like 1100 so like it know the thing growes 100 token right so like you got to know this reserve doesn't always get updated so the reserve is like the pool reserve like the money they have and the balance is like the real time real balance then we update reserve to balance state. then it calles the _mintFee() function to mint lp token to the fee acumlator token which is 1/6 of the growth pool or liqudity. then it does checks which is like first it checks if it is like zero pool.
+
+
+Okay the next function is "_mintFee()" it mints 1/6 of the growth in "sqrt(k)". Let me explain what it does.
+
+First it gets the "feeTo" address. This is the address that receives the protocol fee in the form of LP tokens. It is not like they cut the 0.3% trading fee and send that token money to another place. The 0.3% trading fee stays inside the pool, which benefits the LP providers because when the pool grows from trading fees, the value of the LP position also grows. Then, when the protocol fee is turned on, "_mintFee()" calculates the protocol's share of that growth and mints new LP tokens to "feeTo".
+
+Then it checks and sets "feeOn" to true if "feeTo != address(0)". This means if "feeTo" is a normal non-zero address, the protocol fee is turned on.
+
+Then it assigns "_kLast = kLast". The reason for assigning it to a local variable is mainly gas efficiency. "kLast" is a storage variable, so reading it from storage repeatedly is more expensive than reading a local variable from the stack. Since this function uses the value multiple times, caching it locally avoids unnecessary storage reads.
+
+Then we continue with multiple "if" statements. The first checks if the fee is on. Then it checks if "_kLast" isn't zero. If that is true, it calculates:
+
+"rootK = sqrt(reserve0 * reserve1)"
+
+This gives us "sqrt(K)", not K itself.
+
+Then it calculates "rootKLast = sqrt(kLast)".
+
+Then it checks if the current "rootK" is greater than "rootKLast". If that is true, it means "sqrt(K)" has grown since the last time "kLast" was recorded.
+
+Then it calculates the numerator:
+
+"totalSupply * (rootK - rootKLast)"
+
+and the denominator:
+
+"rootK * 5 + rootKLast"
+
+Then:
+
+"liquidity = numerator / denominator"
+
+This gives the amount of new LP tokens that should be minted for the protocol. If "liquidity > 0", it mints those LP tokens to the "feeTo" address.
+
+Then at the end there is an "else if". If the protocol fee is off and "_kLast" isn't zero, it sets "kLast" back to zero so the old fee-growth accounting isn't kept around while the protocol fee is disabled.
+
+---
+
+Okay, let's pass to "mint()".
+
+So I will continue from the total supply, which checks if the total supply is zero. If it is true, that occurs when the pool is new. What it does is calculate the liquidity:
+
+"sqrt(amount0 * amount1) - MINIMUM_LIQUIDITY"
+
+The reason it deducts the minimum liquidity is because 1000 LP tokens are permanently minted to "address(0)". This establishes the minimum liquidity and also helps protect against certain inflation/manipulation problems with the first liquidity position.
+
+Then if the pool total supply isn't zero, it does this calculation:
+
+"min(amount0 * totalSupply / reserve0, amount1 * totalSupply / reserve1)"
+
+Then it takes the minimum amount. This makes sure the user only receives LP tokens based on the limiting side of their deposit and keeps the LP accounting proportional to the pool.
+
+Then it mints the LP tokens to the user. "liquidity" is the amount of LP tokens that the liquidity provider receives for the amount they deposited.
+
+Then we update our stuff by calling "_update()" and, if the protocol fee is on, update "kLast".
+
+---
+
+Okay, the next function is "burn()".
+
+It is the function where we burn the LP tokens and get what they are worth from the pool.
+
+First, the user deposits/transfers their LP tokens to the pair address. Keep that in mind.
+
+Now let's talk about each line.
+
+First it gets the reserve amounts as always. It uses the same pattern to save gas by putting the values into local variables.
+
+Then it gets "token0" and "token1" and stores them in local variables so they can be used more efficiently.
+
+Then it gets the actual token balances because we want the latest information about how many tokens are actually inside the pool.
+
+Then it gets the LP token balance of the pair itself:
+
+"balanceOf[address(this)]"
+
+Because "address(this)" means the pair contract's own address. So this is asking:
+
+"How many LP tokens does the pair contract currently hold?"
+This is why the user first transfers their LP tokens to the pair before calling "burn()".
+
+Then we update the protocol fee accounting by calling "_mintFee()".
+
+Then we get the total supply.
+
+Since we are burning LP tokens and giving the underlying tokens back, we calculate how much of each token the LP tokens are worth.
+
+For token0:
+
+"liquidity * balance0 / totalSupply"
+
+This tells us how much token0 belongs to those LP tokens.
+
+Then we do the same for token1:
+
+"liquidity * balance1 / totalSupply"
+
+Then we check that both amounts are greater than zero. If either is zero, it reverts with "INSUFFICIENT_LIQUIDITY_BURNED".
+
+Then we burn the LP tokens from the pair's balance:
+
+"_burn(address(this), liquidity)"
+
+Again, "address(this)" is the pair contract, because the LP tokens were transferred to the pair before "burn()" was called.
+
+Then it sends the calculated token0 and token1 amounts back to the "to" address.
+
+After the transfer, it reads the actual balances again because the balances have now changed.
+
+Then it calls "_update()" to update the reserves.
+
+Finally, if the protocol fee is on, it updates "kLast".
+
+---
+
+Let's talk about the last important function, which is "swap()".
+
+This is where all the swapping and flash swaps occur.
+
+The function accepts four inputs:
+
+"amount0Out", "amount1Out", "to", and "data".
+
+So it starts with a check that at least one of the output amounts must be greater than zero, because the pair must actually send something out.
+
+Then, as always, it gets the reserves using the same pattern.
+
+Then it checks if either requested output is greater than the reserve. If it is, it reverts because there isn't enough liquidity.
+
+Then it checks that the "to" address isn't the token0 or token1 contract address. This prevents sending the output directly to either token contract.
+
+Then this is the heart of the swap.
+
+First, the user sends the token they want to exchange to the pair.
+
+Let's assume the pool has:
+
+"reserve0 = 1000"
+
+"reserve1 = 2000"
+
+And the user wants to swap 100 token0 for token1.
+
+So the user first sends 100 token0 to the pair.
+
+The actual balances are now:
+
+"balance0 = 1100"
+
+"balance1 = 2000"
+
+This doesn't match the recorded reserves, and that is intentional. The reserves are still:
+
+"reserve0 = 1000"
+
+"reserve1 = 2000"
+
+Then the user calls:
+
+"swap(0, 50, to, data)"
+
+Now let's continue to the core of the function.
+
+There are three "if" statements around the transfers.
+
+The first checks:
+
+"amount0Out > 0"
+
+This is false because "amount0Out = 0", so nothing happens.
+
+Then it checks:
+
+"amount1Out > 0"
+
+This is true because "amount1Out = 50", so it transfers 50 token1 directly to the "to" address.
+
+Now the actual balances become:
+
+"balance0 = 1100"
+
+"balance1 = 1950"
+
+Then the last "if" checks whether "data.length > 0". If there is data, the pair calls the flash-swap callback on the "to" contract. This is what allows flash swaps.
+
+Then, after that, the pair reads the actual token balances again.
+
+Now it tries to calculate "amount0In" and "amount1In".
+
+For token0:
+
+"balance0 > reserve0 - amount0Out"
+
+So:
+
+"1100 > 1000 - 0"
+
+which is true.
+
+Therefore:
+
+"amount0In = balance0 - (reserve0 - amount0Out)"
+
+Putting the values in:
+
+"1100 - (1000 - 0)"
+
+"= 1100 - 1000"
+
+"= 100"
+
+So this tells the pair that 100 token0 came in.
+
+For token1:
+
+"balance1 > reserve1 - amount1Out"
+
+So:
+
+"1950 > 2000 - 50"
+
+which becomes:
+
+"1950 > 1950"
+
+which is false.
+
+Therefore:
+
+"amount1In = 0"
+
+So we have:
+
+"amount0In = 100"
+
+"amount1In = 0"
+
+And that's completely valid because the contract only requires at least one input amount to be greater than zero.
+
+Then it checks that at least one input exists.
+
+After that, it applies the 0.3% fee using the adjusted balances:
+
+"balance0Adjusted = balance0 * 1000 - amount0In * 3"
+
+and:
+
+"balance1Adjusted = balance1 * 1000 - amount1In * 3"
+
+This is basically the same as saying that only 99.7% of the input counts toward satisfying the invariant, while the 0.3% fee remains in the pool.
+
+Then it checks the adjusted balances against the old invariant:
+"balance0Adjusted * balance1Adjusted >= reserve0 * reserve1 * 1000^2"
+
+If that passes, the swap is valid.
+
+Then it calls "_update()" with the actual balances, which makes the current balances become the new reserves.
+
+Finally, it emits the "Swap" event with the input amounts, output amounts, and recipient.

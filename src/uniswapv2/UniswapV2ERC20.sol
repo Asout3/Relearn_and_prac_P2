@@ -17,6 +17,7 @@ contract UniswapV2ERC20 is IUniswapV2ERC20 {
     string public constant override symbol = "UNI-V2";
     uint8 public constant override decimals = 18;
     uint256 public override totalSupply;
+
     mapping(address => uint256) public override balanceOf;
     mapping(address => mapping(address => uint256)) public override allowance;
 
