@@ -304,7 +304,8 @@ contract UniswapV2Integration is Test {
         vm.startPrank(bob);
         token1.transfer(address(pair), bobToken1ToTransfer);
 
-        uint256 bobToken0Expected = (47 ether * 997 * uint256(r1Before)) / (uint256(r0Before) * 1000 + 47 ether * 997);
+        uint256 bobToken0Expected =
+            (bobToken1ToTransfer * 997 * uint256(r0Before)) / (uint256(r1Before) * 1000 + bobToken1ToTransfer * 997);
 
         vm.expectEmit(true, true, false, true);
         emit Swap(bob, 0, bobToken1ToTransfer, bobToken0Expected, 0, bob);
@@ -326,6 +327,7 @@ contract UniswapV2Integration is Test {
     function test_swap_kInvariantHolds() public {
         uint256 aliceDepositToken0 = 1000 ether;
         uint256 aliceDepositToken1 = 500 ether;
+        uint256 token0Amount = 25 ether;
 
         (address pair, IUniswapV2Pair pairContract, address expected0, address expected1,) = _createPair();
 
@@ -341,9 +343,10 @@ contract UniswapV2Integration is Test {
 
         (uint112 r0Before, uint112 r1Before,) = pairContract.getReserves();
 
-        _addLiquidity(pair, bob, 0, 25 ether);
+        _addLiquidity(pair, bob, 0, token0Amount);
 
-        uint256 Token0Expected1 = (47 ether * 997 * uint256(r1Before)) / (uint256(r0Before) * 1000 + 47 ether * 997);
+        uint256 Token0Expected1 =
+            (token0Amount * 997 * uint256(r0Before)) / (uint256(r1Before) * 1000 + token0Amount * 997);
         pairContract.swap(Token0Expected1, 0, bob, "");
 
         (uint112 r0After, uint112 r1After,) = pairContract.getReserves();
@@ -352,14 +355,13 @@ contract UniswapV2Integration is Test {
 
         (uint112 r0Before1, uint112 r1Before1,) = pairContract.getReserves();
 
-        _addLiquidity(pair, alice, aliceDepositToken0, 60 ether);
+        _addLiquidity(pair, bob, 0, token0Amount);
 
-        uint256 bobToken0Expected2 =
-            (106 ether * 997 * uint256(r1Before)) / (uint256(r0Before) * 1000 + 106 ether * 997);
-        pairContract.swap(bobToken0Expected2, 0, bob, "");
+        uint256 Token0Expected2 =
+            (token0Amount * 997 * uint256(r0Before1)) / (uint256(r1Before1) * 1000 + token0Amount * 997);
+        pairContract.swap(Token0Expected2, 0, bob, "");
 
         (uint112 r0After2, uint112 r1After2,) = pairContract.getReserves();
-
         assertTrue(uint256(r0After2) * uint256(r1After2) >= uint256(r0Before1) * uint256(r1Before1), "K decreased");
     }
 
@@ -367,6 +369,7 @@ contract UniswapV2Integration is Test {
     function test_swap_feeAccounting() public {
         uint256 aliceDepositToken0 = 1000 ether;
         uint256 aliceDepositToken1 = 500 ether;
+        uint256 token0Amount = 25 ether;
 
         (address pair, IUniswapV2Pair pairContract, address expected0, address expected1,) = _createPair();
 
@@ -380,9 +383,10 @@ contract UniswapV2Integration is Test {
         pairContract.mint(alice);
         (uint112 r0Before, uint112 r1Before,) = pairContract.getReserves();
 
-        uint256 bobToken1Expected = (25 ether * 997 * uint256(r1Before)) / (uint256(r0Before) * 1000 + 25 ether * 997);
+        uint256 bobToken1Expected =
+            (token0Amount * 997 * uint256(r1Before)) / (uint256(r0Before) * 1000 + token0Amount * 997);
 
-        _addLiquidity(pair, bob, 25 ether, 0);
+        _addLiquidity(pair, bob, token0Amount, 0);
         pairContract.swap(0, bobToken1Expected, bob, "");
 
         (uint112 r0After, uint112 r1After,) = pairContract.getReserves();
@@ -394,30 +398,71 @@ contract UniswapV2Integration is Test {
     function test_swap_with_zero_amount() public {
         uint256 aliceDepositToken0 = 1000 ether;
         uint256 aliceDepositToken1 = 500 ether;
+        uint256 token0Amount = 25 ether;
 
-        (address pair, IUniswapV2Pair pairContract, , ,) = _createPair();
+        (address pair, IUniswapV2Pair pairContract,,,) = _createPair();
         _addLiquidity(pair, alice, aliceDepositToken0, aliceDepositToken1);
         pairContract.mint(alice);
 
-         _addLiquidity(pair, bob, 25 ether, 0);
-        vm.expectRevert( "UniswapV2: INSUFFICIENT_OUTPUT_AMOUNT");
+        (uint112 r0Before, uint112 r1Before,) = pairContract.getReserves();
+
+        _addLiquidity(pair, bob, token0Amount, 0);
+        uint256 token0Before = token0.balanceOf(pair);
+        uint256 token1Before = token1.balanceOf(pair);
+        vm.expectRevert("UniswapV2: INSUFFICIENT_OUTPUT_AMOUNT");
         pairContract.swap(0, 0, bob, "");
+
+        (uint112 r0After1, uint112 r1After1,) = pairContract.getReserves();
+
+        assertEq(r0After1, r0Before);
+        assertEq(r1After1, r1Before);
+        assertEq(token0.balanceOf(pair), token0Before);
+        assertEq(token1.balanceOf(pair), token1Before);
     }
 
     // magic number
     function test_swap_exceeding_reserves() public {
-        (address pair, IUniswapV2Pair pairContract, , ,) = _createPair();
+        uint256 token0Amount = 25 ether;
 
-        _addLiquidity(pair, bob, 25 ether, 0);
+        (address pair, IUniswapV2Pair pairContract,,,) = _createPair();
+
+        (uint112 r0Before, uint112 r1Before,) = pairContract.getReserves();
+
+        _addLiquidity(pair, bob, token0Amount, 0);
+        uint256 token0Before = token0.balanceOf(pair);
+        uint256 token1Before = token1.balanceOf(pair);
         vm.expectRevert("UniswapV2: INSUFFICIENT_LIQUIDITY");
-        pairContract.swap(0, 25 ether, bob, "");
+        pairContract.swap(0, token0Amount, bob, "");
+
+        (uint112 r0After1, uint112 r1After1,) = pairContract.getReserves();
+
+        assertEq(r0After1, r0Before);
+        assertEq(r1After1, r1Before);
+        assertEq(token0.balanceOf(pair), token0Before);
+        assertEq(token1.balanceOf(pair), token1Before);
     }
 
-    // this have issues other wise we are done
     function test_mint_with_zero_tokens() public {
-        (address pair, IUniswapV2Pair pairContract, , ,) = _createPair();
+        uint256 token0Amount = 25 ether;
+        uint256 token1Amount = 100 ether;
+
+        (address pair, IUniswapV2Pair pairContract,,,) = _createPair();
+        _addLiquidity(pair, bob, token0Amount, token1Amount);
+        pairContract.mint(alice);
+
+        (uint112 r0Before, uint112 r1Before,) = pairContract.getReserves();
+        uint256 token0Before = token0.balanceOf(pair);
+        uint256 token1Before = token1.balanceOf(pair);
+
         vm.expectRevert("UniswapV2: INSUFFICIENT_LIQUIDITY_MINTED");
         pairContract.mint(alice);
+
+        (uint112 r0After1, uint112 r1After1,) = pairContract.getReserves();
+
+        assertEq(r0After1, r0Before);
+        assertEq(r1After1, r1Before);
+        assertEq(token0.balanceOf(pair), token0Before);
+        assertEq(token1.balanceOf(pair), token1Before);
     }
 }
 
