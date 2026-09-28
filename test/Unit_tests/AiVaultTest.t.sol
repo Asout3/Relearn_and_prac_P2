@@ -2,7 +2,7 @@
 pragma solidity ^0.8.30;
 
 import {Test, console2} from "forge-std/Test.sol";
-import {Vault, ShareToken} from "../src/Vault.sol";
+import {Vault, ShareToken} from "../../src/Vault.sol";
 
 // THIS IS AI GENERATED TEST. FOR EXERCISE 8.
 

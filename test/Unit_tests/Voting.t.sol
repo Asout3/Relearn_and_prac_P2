@@ -2,7 +2,7 @@
 pragma solidity ^0.8.34;
 
 import {Test} from "forge-std/Test.sol";
-import {Voting} from "../src/Voting.sol";
+import {Voting} from "../../src/Voting.sol";
 
 /// @dev This dummy contract acts as a non-owner voter proxy..
 contract DummyNonOwner {

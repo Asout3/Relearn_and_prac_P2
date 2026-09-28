@@ -1,0 +1,5 @@
+1. Why does UniswapV2Pair permanently lock 1000 wei of liquidity to the dead address (address(1)) during the very first mint()? What specific attack does this prevent?
+
+2. In UniswapV2Pair.swap(), the contract checks the invariant using balance0Adjusted * balance1Adjusted >= uint(_reserve0) * _reserve1 * (1000**2). Why does it multiply by 1000**2 (the fee denominator squared) instead of just checking if balance0 * balance1 >= reserve0 * reserve1?
+
+3. What is the purpose of the UQ112x112 library and the price0CumulativeLast / price1CumulativeLast variables in the Pair contract? (Hint: Think about TWAP oracles).

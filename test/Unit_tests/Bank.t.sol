@@ -2,7 +2,7 @@
 pragma solidity ^0.8.34;
 
 import {Test} from "forge-std/Test.sol";
-import {Bank} from "../src/Bank.sol";
+import {Bank} from "../../src/Bank.sol";
 
 /// @dev This is a dummy helper contract to test non owner revert on getTotalBalance
 contract DummyNonOwner {

@@ -1,10 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.30;
 
-// MAKE SURE YOU PUT THE EVEN ADD THE PARAMS OKAY.
-
 import {Test} from "forge-std/Test.sol";
-import {Asout3Token} from "../src/ERC20.sol";
+import {Asout3Token} from "../../src/ERC20.sol";
 
 contract TestERC20 is Test {
     Asout3Token token;

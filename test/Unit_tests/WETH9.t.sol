@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {Test, console2} from "forge-std/Test.sol";
-import {WETH9} from "../src/WETH9.sol";
+import {WETH9} from "../../src/WETH9.sol";
 
 contract TestWETH9 is Test {
     WETH9 weth;
