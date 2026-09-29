@@ -1,5 +1,16 @@
-1. Why does UniswapV2Pair permanently lock 1000 wei of liquidity to the dead address (address(1)) during the very first mint()? What specific attack does this prevent?
+Q1 — The call sequence. Walk me through the exact execution order when Attacker calls VulnerableBank.withdraw(). Which line executes, what triggers the re-entry, and at what point in the sequence does the bank's internal balance variable still show a nonzero amount after the ETH has already left the contract?
 
-2. In UniswapV2Pair.swap(), the contract checks the invariant using balance0Adjusted * balance1Adjusted >= uint(_reserve0) * _reserve1 * (1000**2). Why does it multiply by 1000**2 (the fee denominator squared) instead of just checking if balance0 * balance1 >= reserve0 * reserve1?
+ANSWER:
 
-3. What is the purpose of the UQ112x112 library and the price0CumulativeLast / price1CumulativeLast variables in the Pair contract? (Hint: Think about TWAP oracles).
+1. so the thing the attacker is like after he calls the withdraw from vulnerableBank the attacker contract doesn't have any function to recive the money so he puts a recive function and in the recive function if it recive a money it will recall the contract which calls him so it goes on and on till the contract is drained. the trigger for the rentry is like not following the CEI and the unchecked thing which now is resolved it will revert if this kind of things happne but the unchecked part where the money amount deduction happens thats where the shit is.
+
+Q2 — Why CEI prevents this. Explain Checks-Effects-Interactions. Specifically: why does moving the balance-zeroing line above the external call break the attack? What is the attacker's receive() function no longer able to observe or exploit?
+
+ANSWER:
+2. so as you said cei is like checks - effects - interactions so what it does is like it makes us never update internal balance or accounting after external call which the attacker can recall again and again before the executiion reach the accounting part. so no funciton would be able to drain if they are out of thier own fund if we follow the correct proceedure.
+
+Q3 — Why ReentrancyGuard exists despite CEI. If CEI prevents reentrancy, why do production protocols still add a nonReentrant modifier on top? Give me a concrete scenario where CEI discipline alone is insufficient or fragile.
+
+ANSWER:
+
+3. CEI works but humans may forget about it or it might be best for one function but the non reentrant modifier is real belt for this things. if we take good example we can take cross function reentrancy, read only reentrancy, external call you don't control and this are small examples out of the whole alot of thing so i guss this tells it.
