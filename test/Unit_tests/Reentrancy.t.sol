@@ -6,7 +6,6 @@ import {VulnerableBank} from "../../src/VulnerableBank.sol";
 import {SafeBank} from "../../src/SafeBank.sol";
 import {Attacker, SafeBankAttacker} from "../../src/Attacker.sol";
 
-
 /// @title A simulator for Reentrancy attack and Safer bank
 /// @author Mikiyas.
 /// @notice This is just simulation.
