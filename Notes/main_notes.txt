@@ -1,0 +1,10 @@
+Q1 — Role Hashes vs. Enums. Why do we use bytes32 role hashes (like keccak256("MANAGER_ROLE")) for RBAC instead of just using uint8 enums or simple boolean flags (like mapping(address => bool) isManager)?
+Q2 — The Default Admin. What is the DEFAULT_ADMIN_ROLE in OpenZeppelin's AccessControl? Why is leaving it permanently assigned to the deployer EOA (Externally Owned Account) a critical security risk for a production deployment?
+Q3 — State Integrity. When you test an unauthorized call and it reverts, what specific pieces of state must your test assert remain unchanged to prove the contract wasn't partially corrupted before the revert happened?
+
+
+Answer.
+
+1. this is like very interesting topic where like role hashes have advatages for the uniqueness, sence of secuirty, you can create any roles, upgradability you can simpliy add new roles without touching any other shit and simpilicity.
+2. so the default_admin_role is like the default admin for the whole contract like it is created by default and it have very high power to control every thing, and it is all on address private key. which is a single point of faliure which if the keys are compromised that contract is done and also it can give like access to also unwanted or malicous users. so we should transfer to multisig, DAO, or use AccessControlDefaultAdminRules so ya.
+3. When testing an unauthorized call that should revert, you must assert that all relevant state remains unchanged: role assignments, balances, allowances, total supply, ownership, paused status, and any other contract-specific variables. You should also assert the correct revert reason and that no events were emitted. This proves the contract did not partially execute before reverting.

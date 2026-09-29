@@ -5,6 +5,9 @@ libs = ["lib"]
 via_ir = true
 optimizer = true
 optimizer_runs = 200
+remappings = [
+    "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
+]
 
 [profile.ci]
 via_ir = true
