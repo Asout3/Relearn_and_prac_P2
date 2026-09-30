@@ -109,7 +109,7 @@ contract TestTreasury is Test {
         assertEq(address(treasury).balance, 100 ether);
     }
 
-    function test_managerWithdraw_reverts_for_viewr() public {
+    function test_managerWithdraw_reverts_for_viewer() public {
         vm.expectRevert(
             abi.encodeWithSelector(
                 IAccessControl.AccessControlUnauthorizedAccount.selector, VIEWER, treasury.MANAGER_ROLE()
@@ -133,7 +133,7 @@ contract TestTreasury is Test {
         treasury.viewBalance();
     }
 
-    function test_viewBalance_revert_for_manager() public {
+    function test_viewBalance_reverts_for_manager() public {
         vm.expectRevert(
             abi.encodeWithSelector(
                 IAccessControl.AccessControlUnauthorizedAccount.selector, MANAGER, treasury.VIEWER_ROLE()
@@ -144,7 +144,7 @@ contract TestTreasury is Test {
         treasury.viewBalance();
     }
 
-    function test_test_withdraw_reverts_for_random_user() public {
+    function test_withdraw_reverts_for_random_user() public {
         vm.expectRevert(
             abi.encodeWithSelector(
                 IAccessControl.AccessControlUnauthorizedAccount.selector, random, treasury.DEFAULT_ADMIN_ROLE()
