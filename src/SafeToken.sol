@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.34;
 
-/// @title SafeToken
+/// @title SafeToken.
 /// @author Mikiyas.
 /// @dev This is safe token experiment.
 contract SafeToken {
