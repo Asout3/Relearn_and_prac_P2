@@ -7,7 +7,7 @@ import {MaliciousReceiver} from "../../src/MaliciousReceiver.sol";
 
 contract TestTipJar is Test {
     TipJar tipJ;
-    MaliciousReceiver maliciousReceiver; // maliciousReceiver
+    MaliciousReceiver maliciousReceiver; // malicious receiver
     address elon;
     address messi;
     address MJ;
