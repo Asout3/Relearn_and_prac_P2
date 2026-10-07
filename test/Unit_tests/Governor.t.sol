@@ -811,9 +811,8 @@ contract GovernorSecurityTest is Test {
         _vote(va, id, false);
         vm.warp(_end(id));
 
-        Governor.ProposalState expected = (fv + av < QUORUM || fv <= av)
-            ? Governor.ProposalState.Defeated
-            : Governor.ProposalState.Queued;
+        Governor.ProposalState expected =
+            (fv + av < QUORUM || fv <= av) ? Governor.ProposalState.Defeated : Governor.ProposalState.Queued;
         _assertState(id, expected);
     }
 

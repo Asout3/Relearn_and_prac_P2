@@ -23,7 +23,6 @@ interface IERC20 {
     function transferFrom(address from, address to, uint256 value) external returns (bool);
 }
 
-
 /// @notice This contract is taken from the phase one of relearn solidity
 ///         and modified the contract to make follow best practice the core
 ///         logic did not change only the solidity best practice. You can
@@ -31,8 +30,6 @@ interface IERC20 {
 ///         https://github.com/Asout3/Relearn_and_prac/blob/main/src/Governor.sol
 ///         This contract is not gas optmized and also have bugs so never use
 ///         this contract in production.
-
-
 
 /// @title Governor
 /// @author Mikiyas Y.
