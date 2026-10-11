@@ -455,7 +455,7 @@ contract GovernorSecurityTest is Test {
         assertEq(gov.currentID(), 51);
     }
 
-    /// No cap on calldata size -> unbounded storage per proposal.
+    /// No cap on calldata size -> unbounded storage per proposal
     function test_VULN_unboundedCallData() public {
         bytes memory big = new bytes(20_000);
         uint256 id = _propose(alice, address(counter), big);

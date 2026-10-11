@@ -121,8 +121,6 @@ contract Governor {
     /// @param callData Calldata to send to `target`.
     /// @param description Short proposal description.
     function propose(address target, bytes calldata callData, string calldata description) external {
-        // i need to follow the CEI i need to check this things since creating proposal take some gas i need to check if there is no slop proposal
-        // i need to check for zero address and if they can affroed it which is the token they hold.
         require(IERC20(TOKEN).balanceOf(msg.sender) > 0, "You don't have enough power to propose");
         require(target != address(0), "zero address contract is not allowed");
         require(bytes(description).length <= MAX_DESCRIPTION_LENGTH, "too much wtf make it short");
@@ -186,7 +184,7 @@ contract Governor {
     /// @param proposalId ID of the proposal.
     /// @return Current state of the proposal.
     /// @custom:issues This function uses block timestamp to compare which can be
-    ///                manupliated so it is known issue and accept risk.
+    ///                manupliated so it is known issue and accept risk for this exercise.
     function state(uint256 proposalId) public view returns (ProposalState) {
         if (proposals[proposalId].executed) {
             return ProposalState.Executed;
