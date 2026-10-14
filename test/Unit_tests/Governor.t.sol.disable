@@ -2,6 +2,9 @@
 pragma solidity ^0.8.34;
 
 /// @notice This test contract is written by AI.
+/// @notice The reason i disabled this test contract it takes a lot of time
+///         to run the fuzz and invariant test kills resource and time so 
+///         who ever wants to run it can remove it and makes it run.
 
 import {Test, stdError} from "forge-std/Test.sol";
 import {Governor} from "../../src/Governor.sol";

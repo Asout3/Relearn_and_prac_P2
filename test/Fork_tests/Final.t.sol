@@ -40,7 +40,9 @@ contract Forktest is Test {
     address alice;
 
     /// @notice Sets up labels and creates the `alice` address before each test.
+    ///         and creates and select fork at specific block.
     function setUp() public {
+        vm.createSelectFork(vm.envString("MAINNET_RPC_URL"), 18_000_000);
         vm.label(USDC, "USDC");
         vm.label(DAI, "DAI");
         alice = makeAddr("alice");
@@ -49,6 +51,7 @@ contract Forktest is Test {
     /// @notice Checks that USDC reports 6 decimals on mainnet.
     /// @dev This is a simple fork test that reads real on-chain data.
     function test_usdcHas6Decimals() public view {
+        console2.log(IERC20(USDC).decimals());
         assertEq(IERC20(USDC).decimals(), 6);
     }
 
