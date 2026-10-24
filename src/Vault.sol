@@ -209,7 +209,7 @@ contract ShareToken {
      * @notice Returns the total share supply.
      * @return The total number of shares.
      */
-    function totalSupplies() external view returns (uint256) {
+    function totalSupply_() external view returns (uint256) {
         return totalSupply;
     }
 
@@ -243,7 +243,7 @@ contract Vault {
      * @param _address Address that deposited.
      * @param _amount Amount of underlying tokens deposited.
      */
-    event Deposite(address indexed _address, uint256 indexed _amount);
+    event Deposit(address indexed _address, uint256 indexed _amount);
 
     /**
      * @notice Emitted when a user withdraws underlying tokens.
@@ -279,22 +279,22 @@ contract Vault {
      *      shares = (_amount * totalShares) / totalAssets.
      * @param _amount Amount of underlying tokens to deposit.
      */
-    function deposite(uint256 _amount) external {
+    function deposit(uint256 _amount) external {
         if (_amount == 0) revert ZeroAmountInputed();
         // this is the share variable which i used to store the share to calculate
         uint256 share;
 
-        if (shareToken.totalSupplies() == 0) {
+        if (shareToken.totalSupply_() == 0) {
             share = _amount;
         } else {
-            share = (_amount * shareToken.totalSupplies()) / token.balanceOf(address(this));
+            share = (_amount * shareToken.totalSupply_()) / token.balanceOf(address(this));
         }
 
         bool success = token.transferFrom(msg.sender, address(this), _amount);
         require(success, "transaction failed");
 
         shareToken.mint(share, msg.sender);
-        emit Deposite(msg.sender, _amount);
+        emit Deposit(msg.sender, _amount);
     }
 
     /**
@@ -308,7 +308,7 @@ contract Vault {
         // calculate tokens to give back: amount = (shares * totalAssets) / totalShares
         uint256 amount;
 
-        amount = (_sharesToBurn * token.balanceOf(address(this))) / shareToken.totalSupplies();
+        amount = (_sharesToBurn * token.balanceOf(address(this))) / shareToken.totalSupply_();
 
         // burn shares
         shareToken.burn(msg.sender, _sharesToBurn);
@@ -329,10 +329,10 @@ contract Vault {
     function previewDeposit(uint256 _amount) external view returns (uint256) {
         uint256 share;
 
-        if (shareToken.totalSupplies() == 0) {
+        if (shareToken.totalSupply_() == 0) {
             return _amount;
         } else {
-            share = (_amount * shareToken.totalSupplies()) / token.balanceOf(address(this));
+            share = (_amount * shareToken.totalSupply_()) / token.balanceOf(address(this));
             return share;
         }
     }
@@ -341,7 +341,6 @@ contract Vault {
      * @notice Returns the total underlying assets held by the vault.
      * @return The underlying token balance of the vault.
      */
-    //Anyone can check the total assets held by the vault
     function totalAsset() external view returns (uint256) {
         return token.balanceOf(address(this));
     }

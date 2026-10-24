@@ -128,7 +128,7 @@ contract VaultSecurityTest is Test {
         uint256 amount = 100e18;
 
         vm.prank(alice);
-        vault.deposite(amount);
+        vault.deposit(amount);
 
         assertEq(asset.balanceOf(address(vault)), amount);
         assertEq(vault.totalAsset(), amount);
@@ -138,10 +138,10 @@ contract VaultSecurityTest is Test {
 
     function test_Deposit_SecondDepositorReceivesProportionalShares() public {
         vm.prank(alice);
-        vault.deposite(100e18);
+        vault.deposit(100e18);
 
         vm.prank(bob);
-        vault.deposite(50e18);
+        vault.deposit(50e18);
 
         assertEq(vault.totalAsset(), 150e18);
         assertEq(vault.sharesOf(alice), 100e18);
@@ -151,7 +151,7 @@ contract VaultSecurityTest is Test {
 
     function test_Withdraw_BurnsSharesAndReturnsAssets() public {
         vm.prank(alice);
-        vault.deposite(100e18);
+        vault.deposit(100e18);
 
         uint256 aliceBalanceBefore = asset.balanceOf(alice);
 
@@ -168,12 +168,12 @@ contract VaultSecurityTest is Test {
         vm.expectRevert(Vault.ZeroAmountInputed.selector);
 
         vm.prank(alice);
-        vault.deposite(0);
+        vault.deposit(0);
     }
 
     function test_RevertWhenWithdrawingZero() public {
         vm.prank(alice);
-        vault.deposite(1e18);
+        vault.deposit(1e18);
 
         vm.expectRevert(Vault.ZeroAmountInputed.selector);
 
@@ -183,7 +183,7 @@ contract VaultSecurityTest is Test {
 
     function test_RevertWhenWithdrawingMoreSharesThanOwned() public {
         vm.prank(alice);
-        vault.deposite(1e18);
+        vault.deposit(1e18);
 
         vm.expectRevert(Vault.InsufficentShare.selector);
 
@@ -197,7 +197,7 @@ contract VaultSecurityTest is Test {
         vm.expectRevert("transaction failed");
 
         vm.prank(alice);
-        vault.deposite(10e18);
+        vault.deposit(10e18);
 
         assertEq(vault.totalAsset(), 0);
         assertEq(vault.sharesOf(alice), 0);
@@ -206,7 +206,7 @@ contract VaultSecurityTest is Test {
 
     function test_RevertWhenUnderlyingTransferReturnsFalseAndPreservesState() public {
         vm.prank(alice);
-        vault.deposite(10e18);
+        vault.deposit(10e18);
 
         asset.setFailTransfer(true);
 
@@ -237,12 +237,12 @@ contract VaultSecurityTest is Test {
 
     function test_PreviewDepositMatchesActualSharesWhenNoRoundingOccurs() public {
         vm.prank(alice);
-        vault.deposite(100e18);
+        vault.deposit(100e18);
 
         uint256 previewedShares = vault.previewDeposit(25e18);
 
         vm.prank(bob);
-        vault.deposite(25e18);
+        vault.deposit(25e18);
 
         assertEq(previewedShares, 25e18);
         assertEq(vault.sharesOf(bob), previewedShares);
@@ -250,7 +250,7 @@ contract VaultSecurityTest is Test {
 
     function test_InflationAttack_DonationMakesVictimDepositMintZeroShares() public {
         vm.prank(attacker);
-        vault.deposite(1);
+        vault.deposit(1);
 
         vm.prank(attacker);
         asset.transfer(address(vault), 1_000e18);
@@ -264,7 +264,7 @@ contract VaultSecurityTest is Test {
         uint256 bobBalanceBefore = asset.balanceOf(bob);
 
         vm.prank(bob);
-        vault.deposite(victimDeposit);
+        vault.deposit(victimDeposit);
 
         assertEq(vault.sharesOf(bob), 0);
         assertEq(asset.balanceOf(bob), bobBalanceBefore - victimDeposit);
@@ -276,7 +276,7 @@ contract VaultSecurityTest is Test {
         uint256 victimDeposit = 1e18;
 
         vm.prank(attacker);
-        vault.deposite(1);
+        vault.deposit(1);
 
         vm.prank(attacker);
         asset.transfer(address(vault), attackerDonation);
@@ -284,7 +284,7 @@ contract VaultSecurityTest is Test {
         uint256 attackerBalanceBeforeVictimDeposit = asset.balanceOf(attacker);
 
         vm.prank(bob);
-        vault.deposite(victimDeposit);
+        vault.deposit(victimDeposit);
 
         assertEq(vault.sharesOf(bob), 0);
 
@@ -304,7 +304,7 @@ contract VaultSecurityTest is Test {
         asset.transfer(address(vault), donatedAssets);
 
         vm.prank(alice);
-        vault.deposite(firstDeposit);
+        vault.deposit(firstDeposit);
 
         assertEq(vault.sharesOf(alice), firstDeposit);
         assertEq(vault.totalAsset(), donatedAssets + firstDeposit);
@@ -320,7 +320,7 @@ contract VaultSecurityTest is Test {
 
     function test_ZeroShareDepositIsAcceptedAndUserLosesAssets() public {
         vm.prank(alice);
-        vault.deposite(1);
+        vault.deposit(1);
 
         vm.prank(attacker);
         asset.transfer(address(vault), 100e18);
@@ -328,7 +328,7 @@ contract VaultSecurityTest is Test {
         uint256 bobBalanceBefore = asset.balanceOf(bob);
 
         vm.prank(bob);
-        vault.deposite(1);
+        vault.deposit(1);
 
         assertEq(vault.sharesOf(bob), 0);
         assertEq(asset.balanceOf(bob), bobBalanceBefore - 1);
@@ -343,7 +343,7 @@ contract VaultSecurityTest is Test {
         _mintAndApprove(feeAsset, bob, address(feeVault), INITIAL_BALANCE);
 
         vm.prank(alice);
-        feeVault.deposite(100e18);
+        feeVault.deposit(100e18);
 
         assertEq(feeVault.totalAsset(), 99e18);
         assertEq(feeVault.sharesOf(alice), 100e18);
@@ -352,7 +352,7 @@ contract VaultSecurityTest is Test {
         assertGt(bobPreview, 100e18);
 
         vm.prank(bob);
-        feeVault.deposite(100e18);
+        feeVault.deposit(100e18);
 
         assertEq(feeVault.totalAsset(), 198e18);
         assertEq(feeVault.sharesOf(bob), bobPreview);
@@ -371,7 +371,7 @@ contract VaultSecurityTest is Test {
         _mintAndApprove(feeAsset, bob, address(feeVault), INITIAL_BALANCE);
 
         vm.prank(alice);
-        feeVault.deposite(100e18);
+        feeVault.deposit(100e18);
 
         // alice sent 100 but the vault only got 99 because of the 1% fee
         // but she still got 100 shares. that's the bug right there.
@@ -384,7 +384,7 @@ contract VaultSecurityTest is Test {
         console2.log("bob deposite preview: ", feeVault.previewDeposit(100e18));
 
         vm.prank(bob);
-        feeVault.deposite(100e18);
+        feeVault.deposit(100e18);
 
         uint256 shareTotalSupply = 100e18 + 101010101010101010101;
 
@@ -431,7 +431,7 @@ contract VaultSecurityTest is Test {
         uint256 nearMax = type(uint256).max / 2 + 1;
 
         vm.prank(bel);
-        vault.deposite(nearMax);
+        vault.deposit(nearMax);
 
         vm.prank(attacker);
         asset.transfer(address(vault), 1);
@@ -439,7 +439,7 @@ contract VaultSecurityTest is Test {
         vm.expectRevert();
 
         vm.prank(bob);
-        vault.deposite(2);
+        vault.deposit(2);
     }
 
     function testFuzz_DepositWithdrawRoundTripPreservesAccounting(uint96 rawDepositAmount, uint96 rawWithdrawAmount)
@@ -448,7 +448,7 @@ contract VaultSecurityTest is Test {
         uint256 depositAmount = bound(uint256(rawDepositAmount), 1, 100_000e18);
 
         vm.prank(alice);
-        vault.deposite(depositAmount);
+        vault.deposit(depositAmount);
 
         uint256 sharesToBurn = bound(uint256(rawWithdrawAmount), 1, depositAmount);
         uint256 aliceBalanceBefore = asset.balanceOf(alice);
