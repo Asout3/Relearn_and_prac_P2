@@ -260,7 +260,7 @@ contract Vault {
     /**
      * @notice Thrown when an account has insufficient shares.
      */
-    error InsufficentShare();
+    error InsufficientShare();
 
     /**
      * @notice Creates a vault for a given underlying token.
@@ -303,7 +303,7 @@ contract Vault {
      * @param _sharesToBurn Number of shares to burn.
      */
     function withdraw(uint256 _sharesToBurn) external {
-        if (shareToken.balanceOf(msg.sender) < _sharesToBurn) revert InsufficentShare();
+        if (shareToken.balanceOf(msg.sender) < _sharesToBurn) revert InsufficientShare();
         if (_sharesToBurn == 0) revert ZeroAmountInputed();
         // calculate tokens to give back: amount = (shares * totalAssets) / totalShares
         uint256 amount;

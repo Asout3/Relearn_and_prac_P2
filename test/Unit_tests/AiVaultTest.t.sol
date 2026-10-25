@@ -185,7 +185,7 @@ contract VaultSecurityTest is Test {
         vm.prank(alice);
         vault.deposit(1e18);
 
-        vm.expectRevert(Vault.InsufficentShare.selector);
+        vm.expectRevert(Vault.InsufficientShare.selector);
 
         vm.prank(alice);
         vault.withdraw(1e18 + 1);
