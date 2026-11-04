@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.34;
 
+/// @notice The natSpec(doc) is written by an AI(deepseek v4.1 flash).
+
 import {Test, console2} from "forge-std/Test.sol";
 import {StakingRewards, RewardToken, IAsout3Token} from "../../src/StakingRewards.sol";
 

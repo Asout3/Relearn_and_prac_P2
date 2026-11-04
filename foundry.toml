@@ -23,5 +23,7 @@ seed = "0x1234"
 [invariant]
 runs = 256
 depth = 64
+fail_on_revert = false   # keep false while diagnosing
+show_metrics = true
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

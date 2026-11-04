@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.34;
 
+/// @notice The natSpec(doc) is written by an AI(deepseek v4.1 flash).
+
 import {Test} from "forge-std/Test.sol";
 import {AMM, LP} from "../../src/AMM.sol";
 
@@ -8,7 +10,7 @@ import {AMM, LP} from "../../src/AMM.sol";
  * @title AMMInvariantTest
  * @notice Handler-free invariant suite for the `AMM` constant-product pool.
  * @dev    Intentionally written *without* a handler to demonstrate why one is
- *         needed — the majority of invariants here fail (roughly 90%+) and
+ *         needed — the majority of the calls here fail (roughly 90%+) and
  *         that is expected. Only `swapAforB` and `swapBforA` are targeted
  *         because the fuzzer's random caller has no `deal()` / `approve()`
  *         setup, so `addLiquidity` / `removeLiquidity` would revert on
@@ -17,9 +19,9 @@ import {AMM, LP} from "../../src/AMM.sol";
  *         across swaps.
  */
 contract AMMInvariantTest is Test {
-    AMM amm;
-    LP tokenA;
-    LP tokenB;
+    AMM public amm;
+    LP public tokenA;
+    LP public tokenB;
 
     uint256 initialK;
     uint256 constant AMOUNT_OF_TOKEN = 10_000 ether;
