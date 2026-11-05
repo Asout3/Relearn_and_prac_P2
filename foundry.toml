@@ -22,7 +22,7 @@ seed = "0x1234"
 
 [invariant]
 runs = 256
-depth = 64
+depth = 100
 fail_on_revert = false   # keep false while diagnosing
 show_metrics = true
 
