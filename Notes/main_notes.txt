@@ -1,8 +1,21 @@
 Invariant:
 
-- After successful flash loan The amount of repayment must always be equals to or greater than the original borrowed amount.
+- After successful flash loan The amount of repayment must always be equals to or greater than the original borrowed amount because the user must pay the fee.
 - After unsuccessful flash loan the balance of the lender balance must be equal to before the failed action it must be the same to it.
-- for standard erc20 a borrower must pay fee also. no matter the value of the fee is.
-- any repayment issue should revert if the borrower revoke approval the transaction should revert and no flashloan must happen. if also the borrower give less approval than exepected it should revert and no flashloan should happen. if the borrower tried to transfer the tokens away so it doesn't have any thing left it should also revert and no flahsloan must happen and the balance before should be equal to the balance before.
+- any repayment issue should revert if the borrower revoke approval the transaction should revert. if also the borrower give less approval than exepected it should revert. if the borrower tried to transfer the tokens away so it doesn't have any thing left it should also revert and no flahsloan must happen and the balance before should be equal to the balance before.
 - I should check what happens when the user use fee on transfer token and understand. based on my assumption it should not work but i should not guess instead i should test and be sure.
 - i should test one happy path, one bad repyament and one fee on transfer token and one reentrancy.
+
+
+b + a + f; which f = 3a/1000
+b + a + 3a/1000 so a/1 + 3a/1000 = a1000 + 3a/1000 = 1003a / 1000.
+b + 1003a/1000;
+
+--------------------------------
+
+lender balance after both legs = B - A + (A + f)(1 - t)
+A = 1000e18, f = 3e18, at t = 0.1% and t = 1%
+lets assume B = 2000e18;
+
+2000e18 - 1000e18 + (1000e18 + 3e18)(1 - 0.001)  => this is for 1%
+49075.860131 * 0.99

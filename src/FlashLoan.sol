@@ -102,7 +102,7 @@ contract FlashLender {
 /// @notice Example flash-loan borrower that initiates a loan and repays it during the callback.
 /// @dev Implements the borrower-side callback expected by `FlashLender`. The borrower must hold enough tokens to cover the fee and approve the lender for `amount + fee`.
 /// @custom:security The callback accepts calls only from the configured lender and requires the initiator to be this borrower.
-// as i said there will be some customization so i will try my best looking look like the original erc3156.
+// as i said there will be some customization so i will try my best looking look like the original erc3156. this is just an example
 contract flashBorrower {
     /// @notice Action selector used to choose callback behavior.
     /// @dev Encoded into the callback `data` parameter by `flashloan`.
@@ -131,7 +131,6 @@ contract flashBorrower {
     /// @custom:security Reverts if the caller is not the configured lender or if `initiator` is not this borrower.
     function onFlashLoan(address _initiator, address _token, uint256 _amount, uint256 _fee, bytes calldata _data)
         external
-        view
         returns (bytes32)
     {
         require(msg.sender == address(lender), "untrusted lender");
